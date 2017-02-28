@@ -11,8 +11,11 @@ sudo apt-get install -y apache2
 
 ### Configuración del entorno ###
 
+# ruta raíz del servidor web
+APACHE_ROOT="/var/www";
 # ruta de la aplicación
-APP_PATH="/var/www/devops";
+APP_PATH="$APACHE_ROOT/utn-devops";
+
 
 ## configuración servidor web
 #copio el archivo de configuración del repositorio en la configuración del servidor web
