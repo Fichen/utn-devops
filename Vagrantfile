@@ -10,7 +10,7 @@ Vagrant.configure("2") do |config|
 
   # Redirecciono puertos desde la maquina virtual a la maquina real. Por ejemplo 
   # del puerto 80 (web) de la maquina virtual con Debian se podrá acceder a través
-  # del puerto 8080 de nuestro navegador.
+  # del puerto 8081 de nuestro navegador.
   # Esto se realiza para poder darle visibilidad a los puertos de la maquina virtual 
   # y además para que no se solapen los puertos con los de nuestra equipo en el caso de que
   # ese número de puerto este en uso.
