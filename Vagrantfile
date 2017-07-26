@@ -78,9 +78,9 @@ Vagrant.configure("2") do |config|
   # Copia el archivo de configuración del servidor web
   config.vm.provision "file", source: "Configs/devops.site.conf", destination: "/tmp/devops.site.conf"
   
-  # En este archivo tendremos el provisionamiento de software necesario para nuestra 
-  # maquina virtual. Por ejemplo, servidor web, servidor de base de datos, etc.
-  config.vm.provision :shell, path: "Vagrant.bootstrap.sh", run: "always"
+  # En este archivo declararemos el aprovisionamiento para la instalación de Docker
+  config.vm.provision :shell, path: "Vagrant.bootstrap.sh"
   
+   
 
 end
