@@ -31,7 +31,7 @@ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubun
 sudo apt-get update -y ;
 
 #Instalo docker desde el repositorio oficial
-sudo apt-get install -y docker-ce;
+sudo apt-get install -y docker-ce docker-compose
 
 #Lo configuro para que inicie en el arranque
 sudo systemctl enable docker
