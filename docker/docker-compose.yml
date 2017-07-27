@@ -1,0 +1,34 @@
+version: '2'
+services:
+    web:
+        image: httpd:2.4
+        ports:
+            - "8081:80"
+        restart: always
+        volumes:
+            - "./configs/httpd/devops.site.conf:/usr/local/apache2/conf/httpd.conf"
+            - "/var/www/utn-devops-app:/var/www/utn-devops-app"
+        depends_on:
+            - "php"
+            - "db"
+    php:
+		build: .
+        volumes:
+            - "./configs/php/php.ini:/usr/local/etc/php/php.ini"
+            - "/var/www/utn-devops-app:/var/www/utn-devops-app"
+    composer:
+        image: composer/composer
+        volumes:
+            - "/var/www/utn-devops-app:/var/www/utn-devops-app"
+        command: install
+    db:
+        image: mysql
+        container_name: mysql
+        restart: always
+        environment:
+            - MYSQL_DATABASE=devops_app
+            - MYSQL_ROOT_PASSWORD=root
+        ports:
+            - 4306:3306
+        volumes:
+            - ./var/db/mysql:/var/lib/mysql
