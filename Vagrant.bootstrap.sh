@@ -5,9 +5,15 @@
 #Actualizo los paquetes de la maquina virtual
 sudo apt-get update -y ;
 
-#Desintalo el servidor web, a partir de ahora va a estar en un contenedor de Docker
+#Desintalo el servidor web instalado previamente en la unidad 1, 
+# a partir de ahora va a estar en un contenedor de Docker.
 sudo apt-get remove --purge apache2 -y; 
 sudo apt autoremove -y;
+
+# Directorio para los archivos de la base de datos MySQL. El servidor de la base de datos 
+# es instalado mediante una imagen de Docker. Esto está definido en el archivo
+# docker-compose.yml
+sudo mkdir -p /var/db/mysql
 
 ######## Instalacion de DOCKER ########
 #
@@ -35,4 +41,5 @@ sudo apt-get install -y docker-ce docker-compose
 
 #Lo configuro para que inicie en el arranque
 sudo systemctl enable docker
+
 
