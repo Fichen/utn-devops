@@ -33,4 +33,6 @@ sudo apt-get update -y ;
 #Instalo docker desde el repositorio oficial
 sudo apt-get install -y docker-ce;
 
+#Lo configuro para que inicie en el arranque
+sudo systemctl enable docker
 
