@@ -75,12 +75,7 @@ Vagrant.configure("2") do |config|
   #  date > /etc/vagrant_provisioned_at
   #SHELL
   
-  # Copia el archivo de configuración del servidor web
-  config.vm.provision "file", source: "Configs/devops.site.conf", destination: "/tmp/devops.site.conf"
-  
   # En este archivo declararemos el aprovisionamiento para la instalación de Docker
   config.vm.provision :shell, path: "Vagrant.bootstrap.sh"
   
-   
-
 end
