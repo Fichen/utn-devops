@@ -15,6 +15,9 @@ sudo apt autoremove -y;
 # docker-compose.yml
 sudo mkdir -p /var/db/mysql
 
+# Muevo el archivo de configuración de firewall al lugar correspondiente
+sudo mv -f /tmp/ufw /etc/default/ufw
+
 ######## Instalacion de DOCKER ########
 #
 # Esta instalación de docker es para demostrar el aprovisionamiento 
