@@ -5,6 +5,7 @@ services:
     build: .
     volumes:
       - "./configs/php/php.ini:/usr/local/etc/php/php.ini"
+      - "./configs/httpd/devops.site.conf:/etc/apache2/sites-available/000-default.conf"
       - "/var/www/utn-devops-app:/var/www/html"
     ports:
       - "8081:80" 
