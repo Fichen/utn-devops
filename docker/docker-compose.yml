@@ -16,9 +16,10 @@ services:
     container_name: mysql
     restart: always
     environment:
-      - MYSQL_DATABASE=devops_app
-      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=devops_app #creará una base de datos con ese nombre
+      - MYSQL_ROOT_PASSWORD=root #clave de administrador del servidor MySQL
     ports:
       - "4400:3306"
     volumes:
       - /var/db/mysql:/var/lib/mysql
+
