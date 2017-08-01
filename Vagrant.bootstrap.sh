@@ -18,6 +18,18 @@ sudo mkdir -p /var/db/mysql
 # Muevo el archivo de configuración de firewall al lugar correspondiente
 sudo mv -f /tmp/ufw /etc/default/ufw
 
+# Configuración applicación
+# ruta raíz del servidor web
+APACHE_ROOT="/var/www";
+# ruta de la aplicación
+APP_PATH="$APACHE_ROOT/utn-devops-app/";
+
+# descargo la app del repositorio
+cd $APACHE_ROOT;
+sudo git clone https://github.com/Fichen/utn-devops-app.git;
+cd $APP_PATH;
+sudo git checkout unidad-2;
+
 ######## Instalacion de DOCKER ########
 #
 # Esta instalación de docker es para demostrar el aprovisionamiento 
