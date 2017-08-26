@@ -28,6 +28,33 @@ sudo git clone https://github.com/Fichen/utn-devops-app.git;
 cd $APP_PATH;
 sudo git checkout unidad-2;
 
+######## Instalacion de DOCKER ########
+#
+# Esta instalación de docker es para demostrar el aprovisionamiento 
+# complejo mediante Vagrant. La herramienta Vagrant por si misma permite 
+# un aprovisionamiento de container mediante el archivo Vagrantfile. A fines 
+# del ejemplo que se desea mostrar en esta unidad que es la instalación mediante paquetes del
+# software Docker este ejemplo es suficiente, para un uso más avanzado de Vagrant
+# se puede consultar la documentación oficial en https://www.vagrantup.com
+#
+
+#Instalamos paquetes adicionales 
+sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common ;
+
+##Configuramos el repositorio
+curl -fsSL "https://download.docker.com/linux/ubuntu/gpg" > /tmp/docker_gpg;
+sudo apt-key add < /tmp/docker_gpg && sudo rm -f /tmp/docker_gpg;
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable";
+
+#Actualizo los paquetes con los nuevos repositorios
+sudo apt-get update -y ;
+
+#Instalo docker desde el repositorio oficial
+sudo apt-get install -y docker-ce docker-compose
+
+#Lo configuro para que inicie en el arranque
+sudo systemctl enable docker
+
 ## Instalación de Puppet
 #configuración de repositorio
 wget https://apt.puppetlabs.com/puppet5-release-xenial.deb
@@ -63,7 +90,7 @@ sudo service puppetmaster stop && service puppetmaster start
 
 # limpieza de configuración del dominio utn-devops.localhost es nuestro nodo agente.
 # en nuestro caso es la misma máquina
-sudo puppet node clean utn-devops.localhost
+sudo puppet node clean utn-devops
 
 # Para este nodo lanzo una petición a Puppet Master para que acepte las peticiones del agente que
 # acabamos de instalar, recalco de nuevo que en este caso es el mismo equipo, pero es necesario ejecutarlo.
@@ -72,14 +99,14 @@ sudo puppet node clean utn-devops.localhost
 # Este comando en otro tipo de configuración se debería ejecutar en el nodo que contiene solamente el Puppet agente
 
 # Primero habilito el agente
-sudo puppet agent --enable
+sudo puppet agent --certname utn-devops --enable
 # Lanzo una prueba de conexión del agente al maestro
-sudo puppet agent --verbose --debug --server utn-devops.localhost --waitforcert 60 --test
+sudo puppet agent --certname utn-devops --verbose --debug --server utn-devops.localhost --waitforcert 60 --test
 
 
 # Esta llamada se debería ejecutar en el master. Se utiliza para generar los certificados
 # de seguridad con el nodo agente
-sudo puppet cert sign utn-devops.localhost
+sudo puppet cert sign utn-devops
 
 
 
