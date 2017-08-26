@@ -12,6 +12,9 @@ sudo mkdir -p /var/db/mysql
 
 # Muevo el archivo de configuración de firewall al lugar correspondiente
 sudo mv -f /tmp/ufw /etc/default/ufw
+# Muevo el archivo hosts. En este archivo esta asociado el nombre de dominio con una dirección
+# ip para que funcione las configuraciones de Puppet
+sudo mv -f /tmp/etc_hosts /etc/hosts
 
 ## Configuración applicación
 # ruta raíz del servidor web
@@ -31,25 +34,38 @@ wget https://apt.puppetlabs.com/puppet5-release-xenial.deb
 sudo dpkg -i puppet5-release-xenial.deb
 sudo apt update
 
-#instalación de master y agentes
+# Instalación de master
 sudo apt-get install -y puppet-lint puppetmaster
 
-# Muevo el archivo de configuración de Puppet al lugar correspondiente
-sudo mv -f /tmp/puppet.conf /etc/puppet/puppet.conf
+# Instalación de agente. Esto se debiera hacer en otro equipo pero se realiza aquí para simplificar
+# el ejemplo
+sudo apt-get install -y puppet 
 
-## Comandos de limpieza de configuración. el dominio utn-devops.localhost es nuestro nodo agente.
-# en nuestro caso es la misma máquina
-sudo puppet node clean utn-devops.localhost
-# elimino certificados del cliente
+# Muevo el archivo de configuración de Puppet al lugar correspondiente
+sudo mv -f /tmp/puppet-master.conf /etc/puppet/puppet.conf
+
+# elimino certificados de que se generan en la instalación.
+# no nos sirven ya que el certificado depende del nombre que se asigne al maestro
+# y en este ejemplo se modifico.
 sudo rm -rf /var/lib/puppet/ssl
 
+# al detener e iniciar el servicio se regeneran los certificados 
+service puppetmaster stop && service puppetmaster start
+
+# limpieza de configuración del dominio utn-devops.localhost es nuestro nodo agente.
+# en nuestro caso es la misma máquina
+sudo puppet node clean utn-devops.localhost
 
 # Para este nodo lanzo una petición a Puppet Master para que acepte las peticiones del agente que
 # acabamos de instalar, recalco de nuevo que en este caso es el mismo equipo, pero es necesario ejecutarlo.
 # El master realizará una serie de configuraciones para aceptar el agente que realizó la petición. Esto 
 # se realiza por seguridad.
 # Este comando en otro tipo de configuración se debería ejecutar en el nodo que contiene solamente el Puppet agente
+
+# Primero habilito el agente
+sudo puppet agent --enable
 sudo puppet agent --verbose --debug --server utn-devops.localhost --waitforcert 60
+
 
 # Esta llamada se debería ejecutar en el master. Se utiliza para generar los certificados
 # de seguridad con el nodo agente
