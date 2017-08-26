@@ -14,7 +14,7 @@ sudo mkdir -p /var/db/mysql
 sudo mv -f /tmp/ufw /etc/default/ufw
 # Muevo el archivo hosts. En este archivo esta asociado el nombre de dominio con una dirección
 # ip para que funcione las configuraciones de Puppet
-sudo mv -f /tmp/etc_hosts /etc/hosts
+sudo mv -f /tmp/etc_hosts.txt /etc/hosts
 
 ## Configuración applicación
 # ruta raíz del servidor web
@@ -49,8 +49,17 @@ sudo mv -f /tmp/puppet-master.conf /etc/puppet/puppet.conf
 # y en este ejemplo se modifico.
 sudo rm -rf /var/lib/puppet/ssl
 
+# Agrego el usuario puppet al grupo de sudo, para no necesitar password al reiniciar un servicio
+sudo usermod -a -G sudo,puppet puppet
+
 # al detener e iniciar el servicio se regeneran los certificados 
-service puppetmaster stop && service puppetmaster start
+sudo service puppetmaster stop && service puppetmaster start
+
+# Instalo el modulo de Puppet para manejar contenedores Docker
+#sudo puppet module install puppetlabs-docker_platform --version 2.2.1
+#sudo mkdir -p /etc/puppet/modules/docker/manifests
+#sudo mkdir /etc/puppet/modules/docker/files
+
 
 # limpieza de configuración del dominio utn-devops.localhost es nuestro nodo agente.
 # en nuestro caso es la misma máquina
@@ -64,7 +73,8 @@ sudo puppet node clean utn-devops.localhost
 
 # Primero habilito el agente
 sudo puppet agent --enable
-sudo puppet agent --verbose --debug --server utn-devops.localhost --waitforcert 60
+# Lanzo una prueba de conexión del agente al maestro
+sudo puppet agent --verbose --debug --server utn-devops.localhost --waitforcert 60 --test
 
 
 # Esta llamada se debería ejecutar en el master. Se utiliza para generar los certificados

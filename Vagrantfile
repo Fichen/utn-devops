@@ -20,6 +20,8 @@ Vagrant.configure("2") do |config|
   
   config.vm.network "forwarded_port", guest: 8081, host: 8081
   config.vm.network "forwarded_port", guest: 4400, host: 4400
+  # Puerto en que escuchar el servidor maestro de Puppet
+  config.vm.network "forwarded_port", guest: 8140, host: 8140
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -83,7 +85,7 @@ Vagrant.configure("2") do |config|
   # una definición del firewall de Ubuntu para permitir el tráfico de red que se redirecciona internamente, configuración 
   # necesaria para Docker. Luego será copiado al lugar correcto por el script Vagrant.bootstrap.sh
   config.vm.provision "file", source: "hostConfigs/ufw", destination: "/tmp/"
-  config.vm.provision "file", source: "hostConfigs/etc_hosts", destination: "/tmp/"
+  config.vm.provision "file", source: "hostConfigs/etc_hosts.txt", destination: "/tmp/"
   #copio el archivo de configuración de Puppet Master
   config.vm.provision "file", source: "hostConfigs/puppet/puppet-master.conf", destination: "/tmp/"
   
