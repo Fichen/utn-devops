@@ -1,14 +1,15 @@
 version: '2'
 services:
   php:
+    image: docker_php
     container_name: apache2_php
     build: .
     volumes:
-      - "./configs/php/php.ini:/usr/local/etc/php/php.ini"
-      - "./configs/httpd/devops.site.conf:/etc/apache2/sites-available/000-default.conf"
-      - "./configs/app/.env:/var/www/html/myapp/.env"
-      - "./configs/app/config_app.sh:/tmp/config_app.sh"
-      - "/var/www/utn-devops-app:/var/www/html"
+      - "/vagrant/docker/configs/php/php.ini:/usr/local/etc/php/php.ini"
+      - "/vagrant/docker/configs/httpd/devops.site.conf:/etc/apache2/sites-available/000-default.conf"
+      - "/vagrant/docker/configs/app/.env:/var/www/html/myapp/.env"
+      - "/vagrant/docker/configs/app/config_app.sh:/tmp/config_app.sh"
+      - "/var/www/utn-devops-app/myapp:/var/www/html"
     ports:
       - "8081:80" 
     depends_on:
@@ -23,4 +24,4 @@ services:
       - "4400:3306"
     volumes:
       - /var/db/mysql:/var/lib/mysql
-      - "./configs/mysql/script.sql:/tmp/script.sql"
+      - "/vagrant/docker/configs/mysql/script.sql:/tmp/script.sql"

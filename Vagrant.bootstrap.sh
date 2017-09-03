@@ -22,40 +22,16 @@ APACHE_ROOT="/var/www";
 # ruta de la aplicación
 APP_PATH="$APACHE_ROOT/utn-devops-app/";
 
+sudo rm -rf $APP_PATH;
+
 # descargo la app del repositorio
 cd $APACHE_ROOT;
 sudo git clone https://github.com/Fichen/utn-devops-app.git;
 cd $APP_PATH;
 sudo git checkout unidad-2;
 
-######## Instalacion de DOCKER ########
-#
-# Esta instalación de docker es para demostrar el aprovisionamiento 
-# complejo mediante Vagrant. La herramienta Vagrant por si misma permite 
-# un aprovisionamiento de container mediante el archivo Vagrantfile. A fines 
-# del ejemplo que se desea mostrar en esta unidad que es la instalación mediante paquetes del
-# software Docker este ejemplo es suficiente, para un uso más avanzado de Vagrant
-# se puede consultar la documentación oficial en https://www.vagrantup.com
-#
 
-#Instalamos paquetes adicionales 
-sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common ;
-
-##Configuramos el repositorio
-curl -fsSL "https://download.docker.com/linux/ubuntu/gpg" > /tmp/docker_gpg;
-sudo apt-key add < /tmp/docker_gpg && sudo rm -f /tmp/docker_gpg;
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable";
-
-#Actualizo los paquetes con los nuevos repositorios
-sudo apt-get update -y ;
-
-#Instalo docker desde el repositorio oficial
-sudo apt-get install -y docker-ce docker-compose
-
-#Lo configuro para que inicie en el arranque
-sudo systemctl enable docker
-
-## Instalación de Puppet
+###### Instalación de Puppet ######
 #configuración de repositorio
 wget https://apt.puppetlabs.com/puppet5-release-xenial.deb
 sudo dpkg -i puppet5-release-xenial.deb
@@ -79,14 +55,12 @@ sudo rm -rf /var/lib/puppet/ssl
 # Agrego el usuario puppet al grupo de sudo, para no necesitar password al reiniciar un servicio
 sudo usermod -a -G sudo,puppet puppet
 
+sudo mkdir -p /etc/puppet/modules/docker/manifests
+sudo cp -f /vagrant/hostConfigs/puppet/site.pp /etc/modules/manifests/
+sudo cp -f /vagrant/hostConfigs/puppet/docker_install.pp /etc/puppet/modules/docker/manifests
+
 # al detener e iniciar el servicio se regeneran los certificados 
 sudo service puppetmaster stop && service puppetmaster start
-
-# Instalo el modulo de Puppet para manejar contenedores Docker
-#sudo puppet module install puppetlabs-docker_platform --version 2.2.1
-#sudo mkdir -p /etc/puppet/modules/docker/manifests
-#sudo mkdir /etc/puppet/modules/docker/files
-
 
 # limpieza de configuración del dominio utn-devops.localhost es nuestro nodo agente.
 # en nuestro caso es la misma máquina
@@ -107,6 +81,8 @@ sudo puppet agent --certname utn-devops --verbose --debug --server utn-devops.lo
 # Esta llamada se debería ejecutar en el master. Se utiliza para generar los certificados
 # de seguridad con el nodo agente
 sudo puppet cert sign utn-devops
+
+sudo puppet agent --certname utn-devops --verbose --debug --server utn-devops.localhost --waitforcert 60 --test
 
 
 
