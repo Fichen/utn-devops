@@ -21,7 +21,6 @@ sudo mv -f /tmp/etc_hosts.txt /etc/hosts
 APP_PATH="/var/www";
 
 
-sudo rm -rf $APP_PATH;
 
 # descargo la app del repositorio
 cd $APP_PATH;
@@ -53,9 +52,11 @@ sudo rm -rf /var/lib/puppet/ssl
 # Agrego el usuario puppet al grupo de sudo, para no necesitar password al reiniciar un servicio
 sudo usermod -a -G sudo,puppet puppet
 
-sudo mkdir -p /etc/puppet/modules/docker/manifests
-sudo cp -f /vagrant/hostConfigs/puppet/site.pp /etc/modules/manifests/
-sudo cp -f /vagrant/hostConfigs/puppet/docker_install.pp /etc/puppet/modules/docker/manifests
+sudo mkdir -p /etc/puppet/modules/docker_install/manifests
+sudo mkdir /etc/puppet/modules/docker_install/files
+sudo cp -f /vagrant/hostConfigs/puppet/site.pp /etc/puppet/manifests/
+sudo cp -f /vagrant/hostConfigs/puppet/docker_install.pp /etc/puppet/modules/docker_install/manifests/init.pp
+sudo cp -f /vagrant/hostConfigs/puppet/.env /etc/puppet/modules/docker_install/files
 
 # al detener e iniciar el servicio se regeneran los certificados 
 sudo service puppetmaster stop && service puppetmaster start

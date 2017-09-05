@@ -86,11 +86,7 @@ Vagrant.configure("2") do |config|
   # necesaria para Docker. Luego será copiado al lugar correcto por el script Vagrant.bootstrap.sh
   config.vm.provision "file", source: "hostConfigs/ufw", destination: "/tmp/utf"
   config.vm.provision "file", source: "hostConfigs/etc_hosts.txt", destination: "/tmp/utf"
-  #copio el archivo de configuración de Puppet Master
-  config.vm.provision "file", source: "hostConfigs/puppet/puppet-master.conf", destination: "/tmp/puppet-master.conf"
-  config.vm.provision "file", source: "hostConfigs/puppet/docker_install.pp", destination: "/tmp/docker_install.pp"
-  config.vm.provision "file", source: "hostConfigs/puppet/site.pp", destination: "/tmp/site.pp"
-
+  
   
   # Con esta sentencia lo que hara Vagrant es transferir este archivo a la máquina Ubuntu
   # y ejecutarlo una vez iniciado. En este caso ahora tendrá el aprovisionamiento para la instalación de Docker

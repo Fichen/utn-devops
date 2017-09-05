@@ -16,7 +16,6 @@ VOLUME ["/var/www/utn-devops-app/myapp","/var/www/html"]
 
 COPY ./configs/php/php.ini /usr/local/etc/php/php.ini
 COPY ./configs/httpd/devops.site.conf /etc/apache2/sites-available/000-default.conf
-COPY ./configs/app/.env /var/www/html/myapp/.env
 COPY ./configs/app/config_app.sh /tmp/config_app.sh
 
 

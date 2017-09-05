@@ -23,9 +23,16 @@ package { 'docker-compose':
   ensure => installed,
 }
 
+file { "/var/www/utn-devops-app/myapp/.env":
+	mode => "0644",
+    owner => 'root',
+    group => 'root',
+	ensure => 'present', 
+    source => 'puppet:///modules/docker_install/env',
+}
+
 # asegurar que el servicio docker se este ejecutando
 service { 'docker':
   ensure => running,
 }
-
 }
