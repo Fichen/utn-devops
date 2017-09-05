@@ -18,16 +18,14 @@ sudo mv -f /tmp/etc_hosts.txt /etc/hosts
 
 ## Configuración applicación
 # ruta raíz del servidor web
-APACHE_ROOT="/var/www";
-# ruta de la aplicación
-APP_PATH="$APACHE_ROOT/utn-devops-app/";
+APP_PATH="/var/www";
+
 
 sudo rm -rf $APP_PATH;
 
 # descargo la app del repositorio
-cd $APACHE_ROOT;
-sudo git clone https://github.com/Fichen/utn-devops-app.git;
 cd $APP_PATH;
+sudo git clone https://github.com/Fichen/utn-devops-app.git;
 sudo git checkout unidad-2;
 
 
