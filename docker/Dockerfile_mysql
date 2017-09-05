@@ -1,0 +1,11 @@
+FROM mysql
+
+ENV MYSQL_DATABASE devops_app
+ENV MYSQL_ROOT_PASSWORD root
+
+VOLUME ["/var/db/mysql","/var/lib/mysql"]
+
+EXPOSE 4400
+
+COPY ./configs/mysql/script.sql /tmp/script.sql
+
