@@ -18,6 +18,7 @@ COPY ./configs/php/php.ini /usr/local/etc/php/php.ini
 COPY ./configs/httpd/devops.site.conf /etc/apache2/sites-available/000-default.conf
 COPY ./configs/app/config_app.sh /tmp/config_app.sh
 
+CMD ["sh","/tmp/config_app.sh"]
 
 EXPOSE 8081
 
