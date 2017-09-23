@@ -12,8 +12,8 @@ services:
     ports:
       - "8081:80" 
     depends_on:
-      - db
-  db:
+      - db_server
+  db_server:
     image: mysql
     container_name: mysql
     environment:
