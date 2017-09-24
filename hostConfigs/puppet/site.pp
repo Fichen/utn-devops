@@ -12,12 +12,4 @@ node 'utn-devops' {
 # utn-devops/hostConfigs/puppet/init.pp
 include 'docker_install'
 
-exec { 'docker-containers-up':                    
- command => 'docker-compose -f /vagrant/docker/docker-compose.yml up -d '  
-}
-
-exec { 'app-config':                    
- command => 'sudo docker exec -it apache2_php /tmp/config_app.sh'  
-}
-
 }

@@ -89,6 +89,7 @@ Vagrant.configure("2") do |config|
   # Archivos de Puppet
   config.vm.provision "file", source: "hostConfigs/puppet/site.pp", destination: "/tmp/site.pp"
   config.vm.provision "file", source: "hostConfigs/puppet/init.pp", destination: "/tmp/init.pp"
+  config.vm.provision "file", source: "hostConfigs/puppet/puppet-master.conf", destination: "/tmp/puppet-master.conf"
   config.vm.provision "file", source: "hostConfigs/puppet/.env", destination: "/tmp/env"
   # Scripts para el servicio de Docker
   config.vm.provision "file", source: "hostConfigs/docker-start.sh", destination: "/tmp/docker-start.sh"

@@ -46,4 +46,12 @@ file { "/var/www/utn-devops-app/myapp/.env":
 service { 'docker':
   ensure => running,
 }
+
+exec { 'config-app':
+  command => 'docker-compose -f /vagrant/docker/docker-compose.yml up -d',       
+  path => '/usr/bin',  
+  onlyif => 'test $(docker ps |grep apache)',
+}
+
+ 
 }

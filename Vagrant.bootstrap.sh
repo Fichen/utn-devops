@@ -69,7 +69,7 @@ sudo mkdir /etc/puppet/modules/docker_install/files
 # muevo los archivos que utiliza Puppet
 sudo mv -f /tmp/site.pp /etc/puppet/manifests/
 sudo mv -f /tmp/init.pp /etc/puppet/modules/docker_install/manifests/init.pp
-sudo mv -f /tmp/.env /etc/puppet/modules/docker_install/files
+sudo mv -f /tmp/env /etc/puppet/modules/docker_install/files
 
 # al detener e iniciar el servicio se regeneran los certificados 
 sudo service puppetmaster stop && service puppetmaster start
@@ -82,10 +82,11 @@ sudo puppet node clean utn-devops
 # acabamos de instalar, recalco de nuevo que en este caso es el mismo equipo, pero es necesario ejecutarlo.
 # El master realizará una serie de configuraciones para aceptar el agente que realizó la petición. Esto 
 # se realiza por seguridad.
-# Este comando en otro tipo de configuración se debería ejecutar en el nodo que contiene solamente el Puppet agente
+# Este comando en otro tipo de configuración se deben ejecutar en el nodo que contiene solamente el Puppet agente. 
+# aquí está documentado para ejemplo
 
 # Primero habilito el agente
-#sudo puppet agent --certname utn-devops --enable
+sudo puppet agent --certname utn-devops --enable
 # Lanzo una prueba de conexión del agente al maestro
 #sudo puppet agent --certname utn-devops --verbose --server utn-devops.localhost --waitforcert 60 --test
 
@@ -96,23 +97,4 @@ sudo puppet node clean utn-devops
 
 # Ejecuto una segunda llamada para que se ejecuten todas las directivas 
 #sudo puppet agent --certname utn-devops --verbose --server utn-devops.localhost --waitforcert 60 --test
-
-#### FIN PUPPET ####
-
-### Inicio Docker ###
-#sudo cd /vagrant/docker/
-
-# Build de la imagen web
-#sudo docker build -t apache2_php .
-
-# Build de la imagen MySQL
-#sudo docker build -f"Dockerfile_mysql" -t mysql .
-	
-#sudo /scripts/docker-start.sh
-#Instalar la app. Obtener el id del container y ejecutar dentro del contenedor
-#sh /tmp/config_app.sh
-
-	
-#MySQL
-#mysql -uroot -proot devops_app < /tmp/script.sql
 
