@@ -100,15 +100,15 @@ sudo puppet node clean utn-devops
 #### FIN PUPPET ####
 
 ### Inicio Docker ###
-sudo cd /vagrant/docker/
+#sudo cd /vagrant/docker/
 
 # Build de la imagen web
-sudo docker build -t apache2_php .
+#sudo docker build -t apache2_php .
 
 # Build de la imagen MySQL
-sudo docker build -f"Dockerfile_mysql" -t mysql .
+#sudo docker build -f"Dockerfile_mysql" -t mysql .
 	
-sudo /scripts/docker-start.sh
+#sudo /scripts/docker-start.sh
 #Instalar la app. Obtener el id del container y ejecutar dentro del contenedor
 #sh /tmp/config_app.sh
 
