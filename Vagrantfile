@@ -19,6 +19,7 @@ Vagrant.configure("2") do |config|
   # solapen los puertos con los de nuestra equipo en el caso de que ese número de puerto este en uso.
   
   config.vm.network "forwarded_port", guest: 8081, host: 8081
+  config.vm.network "forwarded_port", guest: 8082, host: 8082
   config.vm.network "forwarded_port", guest: 4400, host: 4400
   # Puerto en que escuchar el servidor maestro de Puppet
   config.vm.network "forwarded_port", guest: 8140, host: 8140
@@ -89,6 +90,7 @@ Vagrant.configure("2") do |config|
   # Archivos de Puppet
   config.vm.provision "file", source: "hostConfigs/puppet/site.pp", destination: "/tmp/site.pp"
   config.vm.provision "file", source: "hostConfigs/puppet/init.pp", destination: "/tmp/init.pp"
+  config.vm.provision "file", source: "hostConfigs/puppet/init_jenkins.pp", destination: "/tmp/init_jenkins.pp"
   config.vm.provision "file", source: "hostConfigs/puppet/puppet-master.conf", destination: "/tmp/puppet-master.conf"
   config.vm.provision "file", source: "hostConfigs/puppet/.env", destination: "/tmp/env"
   # Scripts para el servicio de Docker

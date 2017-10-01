@@ -12,4 +12,11 @@ node 'utn-devops' {
 # utn-devops/hostConfigs/puppet/init.pp
 include 'docker_install'
 
+# Instalación de Jenkins. Solo lo instalo si el nodo cliente contiene los
+# sistemas operativos Debian o Ubuntu
+case $::operatingsystem {
+        'Debian', 'Ubuntu' : { include jenkins }
+        default  : { notify {"$::operatingsystem no esta soportado":} }
+    }
+
 }

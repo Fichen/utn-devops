@@ -63,14 +63,18 @@ sudo rm -rf /var/lib/puppet/ssl
 # Agrego el usuario puppet al grupo de sudo, para no necesitar password al reiniciar un servicio
 sudo usermod -a -G sudo,puppet puppet
 
-# Estructura de directorios para crear el modulo de Puppet
+# Estructura de directorios para crear el modulo de Puppet para Docker
 sudo mkdir -p /etc/puppet/modules/docker_install/manifests
 sudo mkdir /etc/puppet/modules/docker_install/files
+
+# Lo mismo que el anterior pero para el modulo de Jenkins
+sudo mkdir -p /etc/puppet/modules/jenkins/manifests
 
 # muevo los archivos que utiliza Puppet
 sudo mv -f /tmp/site.pp /etc/puppet/manifests/
 sudo mv -f /tmp/init.pp /etc/puppet/modules/docker_install/manifests/init.pp
 sudo mv -f /tmp/env /etc/puppet/modules/docker_install/files
+sudo mv -f /tmp/init_jenkins.pp /etc/puppet/modules/jenkins/manifests/init.pp
 
 # instalación del modulo de Puppet para el manejo de repositorios de código versionado
 #sudo puppet module install puppetlabs-vcsrepo --version 2.0.0
