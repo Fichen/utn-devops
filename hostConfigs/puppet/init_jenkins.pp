@@ -24,6 +24,28 @@ class jenkins {
         ensure  => present,
         require => Exec['apt-get update'],
     }
+	
+	# Configuración por defecto para jenkins. La diferencia en este archivo 
+	#solo es el cambio de puerto. Del 8080 al 8082
+    file { '/etc/default/jenkins':
+	    ensure  => present,
+		force  => true,
+        mode    => '0644',
+        owner   => root,
+        group   => root,
+        require => Package['jenkins'],
+		source => 'puppet:///modules/jenkins/jenkins_default',
+    }
+	#Archivo para el inicio del servicio de Jenkins. Mismo proposito que el anterior
+	file { '/etc/init.d/jenkins':
+	    ensure  => present,	
+		force  => true,	
+        mode    => '0755',
+        owner   => root,
+        group   => root,
+        require => Package['jenkins'],
+		source => 'puppet:///modules/jenkins/jenkins_init_d',
+    }
 
     # jenkins service
     service { 'jenkins':

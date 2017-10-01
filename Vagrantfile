@@ -93,6 +93,9 @@ Vagrant.configure("2") do |config|
   config.vm.provision "file", source: "hostConfigs/puppet/init_jenkins.pp", destination: "/tmp/init_jenkins.pp"
   config.vm.provision "file", source: "hostConfigs/puppet/puppet-master.conf", destination: "/tmp/puppet-master.conf"
   config.vm.provision "file", source: "hostConfigs/puppet/.env", destination: "/tmp/env"
+  # Archivo para Jenkins
+  config.vm.provision "file", source: "hostConfigs/jenkins/default_jenkins", destination: "/tmp/jenkins_default"
+  config.vm.provision "file", source: "hostConfigs/jenkins/init_d", destination: "/tmp/jenkins_init_d"
   # Scripts para el servicio de Docker
   config.vm.provision "file", source: "hostConfigs/docker-start.sh", destination: "/tmp/docker-start.sh"
   config.vm.provision "file", source: "hostConfigs/docker-stop.sh", destination: "/tmp/docker-stop.sh"

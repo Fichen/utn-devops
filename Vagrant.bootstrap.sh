@@ -69,15 +69,15 @@ sudo mkdir /etc/puppet/modules/docker_install/files
 
 # Lo mismo que el anterior pero para el modulo de Jenkins
 sudo mkdir -p /etc/puppet/modules/jenkins/manifests
+sudo mkdir /etc/puppet/modules/jenkins/files
 
 # muevo los archivos que utiliza Puppet
 sudo mv -f /tmp/site.pp /etc/puppet/manifests/
 sudo mv -f /tmp/init.pp /etc/puppet/modules/docker_install/manifests/init.pp
 sudo mv -f /tmp/env /etc/puppet/modules/docker_install/files
 sudo mv -f /tmp/init_jenkins.pp /etc/puppet/modules/jenkins/manifests/init.pp
-
-# instalación del modulo de Puppet para el manejo de repositorios de código versionado
-#sudo puppet module install puppetlabs-vcsrepo --version 2.0.0
+sudo mv -f /tmp/jenkins_default /etc/puppet/modules/jenkins/files/jenkins_default
+sudo mv -f /tmp/jenkins_init_d /etc/puppet/modules/jenkins/files/jenkins_init_d
 
 # al detener e iniciar el servicio se regeneran los certificados 
 sudo service puppetmaster stop && service puppetmaster start
@@ -88,3 +88,4 @@ sudo puppet node clean utn-devops
 
 # Habilito el agente
 sudo puppet agent --certname utn-devops --enable
+
