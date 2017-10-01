@@ -88,5 +88,3 @@ sudo puppet node clean utn-devops
 
 # Habilito el agente
 sudo puppet agent --certname utn-devops --enable
-# Lanzo una prueba de conexión del agente al maestro
-#sudo puppet agent --certname utn-devops --verbose --server utn-devops.localhost --waitforcert 60 --test
