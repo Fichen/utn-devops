@@ -31,6 +31,7 @@ APP_ROOT="/var/www";
 #ruta aplicación
 APP_PATH=$APP_PATH . "/utn-devops-app";
 
+sudo mkdir $APP_ROOT;
 # descargo la app del repositorio
 cd $APP_ROOT;
 sudo git clone https://github.com/Fichen/utn-devops-app.git;
@@ -71,6 +72,9 @@ sudo mv -f /tmp/site.pp /etc/puppet/manifests/
 sudo mv -f /tmp/init.pp /etc/puppet/modules/docker_install/manifests/init.pp
 sudo mv -f /tmp/env /etc/puppet/modules/docker_install/files
 
+# instalación del modulo de Puppet para el manejo de repositorios de código versionado
+#sudo puppet module install puppetlabs-vcsrepo --version 2.0.0
+
 # al detener e iniciar el servicio se regeneran los certificados 
 sudo service puppetmaster stop && service puppetmaster start
 
@@ -78,23 +82,7 @@ sudo service puppetmaster stop && service puppetmaster start
 # en nuestro caso es la misma máquina
 sudo puppet node clean utn-devops
 
-# Para este nodo lanzo una petición a Puppet Master para que acepte las peticiones del agente que
-# acabamos de instalar, recalco de nuevo que en este caso es el mismo equipo, pero es necesario ejecutarlo.
-# El master realizará una serie de configuraciones para aceptar el agente que realizó la petición. Esto 
-# se realiza por seguridad.
-# Este comando en otro tipo de configuración se deben ejecutar en el nodo que contiene solamente el Puppet agente. 
-# aquí está documentado para ejemplo
-
-# Primero habilito el agente
+# Habilito el agente
 sudo puppet agent --certname utn-devops --enable
 # Lanzo una prueba de conexión del agente al maestro
 #sudo puppet agent --certname utn-devops --verbose --server utn-devops.localhost --waitforcert 60 --test
-
-
-# Esta llamada se debería ejecutar en el master. Se utiliza para generar los certificados
-# de seguridad con el nodo agente
-#sudo puppet cert sign utn-devops
-
-# Ejecuto una segunda llamada para que se ejecuten todas las directivas 
-#sudo puppet agent --certname utn-devops --verbose --server utn-devops.localhost --waitforcert 60 --test
-
