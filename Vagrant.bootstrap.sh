@@ -89,3 +89,6 @@ sudo puppet node clean utn-devops
 # Habilito el agente
 sudo puppet agent --certname utn-devops --enable
 
+# inicio docker
+cd /vagrant/docker
+sudo docker-compose up -d
