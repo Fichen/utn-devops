@@ -7,13 +7,13 @@ class jenkins {
         command => '/usr/bin/wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | apt-key add - ',
     }
 
-    # update
+    # actualizo los repositorios
     exec { 'apt-get update':
         command => '/usr/bin/apt-get update',
-        require => File['/etc/apt/sources.list.d/jenkins.list'],
+        require => File['/etc/apt/sources.list.d/jenkins.list','/etc/apt/sources.list.d/ondrej-ubuntu-php-xenial.list'],
     }
 
-    # source file
+    # archivo que contiene el repositorio para la instalación de Jenkins
     file { '/etc/apt/sources.list.d/jenkins.list':
         content => "deb https://pkg.jenkins.io/debian-stable binary/\n",
         mode    => '0644',
@@ -21,8 +21,16 @@ class jenkins {
         group   => root,
         require => Exec['install_jenkins_key'],
     }
+	
+	#Archivo que contiene un repositorio para la instalación de paquetes de PHP
+	file { '/etc/apt/sources.list.d/ondrej-ubuntu-php-xenial.list':
+        content => "deb http://ppa.launchpad.net/ondrej/php/ubuntu xenial main\n",
+        mode    => '0644',
+        owner   => root,
+        group   => root,
+    }
 
-    # jenkins package
+    # Instalación de jenkins 
     package { 'jenkins':
         ensure  => present,
         require => Exec['apt-get update'],
@@ -50,25 +58,35 @@ class jenkins {
 		source => 'puppet:///modules/jenkins/jenkins_init_d',
     }
 
-    # jenkins service
+    # Aseguro que jenkins siempre se ejecute 
     service { 'jenkins':
         ensure  => running,
         require => Package['jenkins'],
     }
 	
+	# Cambio la clave del usuario de sistema mediante el valor encriptado
 	user { 'jenkins':
 	    ensure	=> present,
 	    password => '$1$hrl1RNSP$DoKnhDdeCLlW.QJGLY8dj1' #utndevops
 	}
 	
-	exec { "install jenkins cli & plugins":
+	# Instalo los plugins necesarios de Jenkins para ejecutar Integración Continua con PHP
+	#Además esta como ejemplo la utilización de variables en Puppet: ${jenkins_pwd}
+	exec { "install_jenkins_cli_and_plugins":
 		cwd         => "/tmp",
-		command     => "wget http://127.0.0.1:8082/jnlpJars/jenkins-cli.jar && java -jar jenkins-cli.jar -s http://127.0.0.1:8082 install-plugin checkstyle cloverphp crap4j dry htmlpublisher jdepend plot pmd violations warnings xunit git greenballs --username jenkins --password ${jenkins_pwd}",
-		path    => ['/usr/bin', '/usr/sbin',],
+		command     => "wget http://127.0.0.1:8082/jnlpJars/jenkins-cli.jar && java -jar jenkins-cli.jar -s http://127.0.0.1:8082 install-plugin checkstyle cloverphp crap4j dry htmlpublisher jdepend plot pmd violations warnings xunit git greenballs --username jenkins --password ${jenkins_pwd} && rm -f /tmp/jenkins-cli.jar",
+		path    => ['/usr/bin', '/usr/sbin','/bin' ],
 	}
 	
-	exec { "install php dependencies for jenkins ":
-		command     => "sudo LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php && sudo apt-get update && sudo apt-get install -y php7.0 php7.0-xdebug php7.0-xsl php7.0-dom php7.0-zip php7.0-mbstring",
-		path    => ['/usr/bin', '/usr/sbin',],
-	}
+	# Instalación de PHP en el equipo que tendrá Jenkins, en este caso de ejemplo es el misma máquina virtual
+	# que contiene toda la práctica.
+	$enhancers = [ 'php7.0', 'php7.0-xdebug', 'php7.0-xsl', 'php7.0-dom', 'php7.0-zip', 'php7.0-mbstring','phpunit', 'php_codesniffer', 'phploc','pdepend','phpmd','phpcpd','php-codebrowse','phpdox']
+	package { $enhancers: ensure => 'installed' }
+
+	#Instalación del aprovisionamiento de paquetes composer de PHP
+	exec { "install_php_composer":
+		cwd         => "/tmp",
+		command     => "php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer && rm -f /tmp/composer-setup.php && sudo chown -R jenkins:jenkins /var/lib/jenkins/.composer",
+		path    => ['/usr/bin', '/usr/sbin', '/bin'],
+	}	
 }
