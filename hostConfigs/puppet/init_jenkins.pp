@@ -2,54 +2,46 @@ class jenkins {
     # get key
     exec { 'install_jenkins_key':
         command => '/usr/bin/wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | apt-key add - ',
-    }
+    } 
 
-    # update
-    exec { 'apt-get update':
-        command => '/usr/bin/apt-get update',
-        require => File['/etc/apt/sources.list.d/jenkins.list'],
-    }
-
-    # source file
+	# source file
     file { '/etc/apt/sources.list.d/jenkins.list':
         content => "deb https://pkg.jenkins.io/debian-stable binary/\n",
+		ensure => present,
         mode    => '0644',
         owner   => root,
         group   => root,
         require => Exec['install_jenkins_key'],
-    }
-
+    } -> #ordeno la secuencia de pasos en el tiempo mediante el operador "->".
+		 # se utiliza para encadenar semanticamente distintas declaraciones	
+    # update
+    exec { 'apt-get update':
+        command => '/usr/bin/apt-get update',
+        #require => File['/etc/apt/sources.list.d/jenkins.list'],
+    } ->
+	
     # jenkins package
     package { 'jenkins':
-        ensure  => present,
-        require => Exec['apt-get update'],
-    }
+        ensure  => installed,
+        require => [
+			File['/etc/apt/sources.list.d/jenkins.list'],
+			Exec['apt-get update']
+		]
+    } -> #Reemplazo el puerto de jenkins para que este escuchando en el 8082
+	exec { 'replace_jenkins_port':
+		command => "/bin/sed -i -- 's/HTTP_PORT=8080/HTTP_PORT=8082/g' /etc/default/jenkins",
+		notify => Service['jenkins'],
+	}
 	
-	# Configuración por defecto para jenkins. La diferencia en este archivo 
-	#solo es el cambio de puerto. Del 8080 al 8082
-    file { '/etc/default/jenkins':
-	    ensure  => present,
-		force  => true,
-        mode    => '0644',
-        owner   => root,
-        group   => root,
-        require => Package['jenkins'],
-		source => 'puppet:///modules/jenkins/jenkins_default',
-    }
-	#Archivo para el inicio del servicio de Jenkins. Mismo proposito que el anterior
-	file { '/etc/init.d/jenkins':
-	    ensure  => present,	
-		force  => true,	
-        mode    => '0755',
-        owner   => root,
-        group   => root,
-        require => Package['jenkins'],
-		source => 'puppet:///modules/jenkins/jenkins_init_d',
-    }
-
-    # jenkins service
+	# Notifico al gestor de servicios que un archivo cambio
+	exec { 'reload-systemctl':
+        command => '/bin/systemctl daemon-reload',
+    } 
+	
+    # aseguro que el servicio de jenkins este activo
     service { 'jenkins':
         ensure  => running,
-        require => Package['jenkins'],
+	    enable  => "true",
+		require => Exec['reload-systemctl']
     }
 }
