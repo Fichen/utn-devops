@@ -1,6 +1,7 @@
 class jenkins {
 
 	$jenkins_pwd = 'utndevops'
+	$jenkins_usr = 'admin'
 
     # get key
     exec { 'install_jenkins_key':
@@ -48,7 +49,6 @@ class jenkins {
     }
 	
 	### Agregado unidad 4
-	# Cambio la clave del usuario de sistema mediante el valor encriptado
 	user { 'jenkins':
 	    ensure	=> present,
 	    password => '$1$hrl1RNSP$DoKnhDdeCLlW.QJGLY8dj1' #utndevops
@@ -58,13 +58,20 @@ class jenkins {
 	#Además esta como ejemplo la utilización de variables en Puppet: ${jenkins_pwd}
 	exec { "install_jenkins_cli_and_plugins":
 		cwd         => "/tmp",
-		command     => "wget http://127.0.0.1:8082/jnlpJars/jenkins-cli.jar && java -jar jenkins-cli.jar -s http://127.0.0.1:8082 install-plugin checkstyle cloverphp crap4j dry htmlpublisher jdepend plot pmd violations warnings xunit git greenballs --username jenkins --password ${jenkins_pwd} && rm -f /tmp/jenkins-cli.jar",
+		command     => "wget http://127.0.0.1:8082/jnlpJars/jenkins-cli.jar && java -jar jenkins-cli.jar -s http://127.0.0.1:8082 install-plugin checkstyle cloverphp crap4j dry htmlpublisher jdepend plot pmd violations warnings xunit git greenballs --username ${jenkins_usr} --password ${jenkins_pwd} && rm -f /tmp/jenkins-cli.jar",
 		path    => ['/usr/bin', '/usr/sbin','/bin' ],
 	}
 	
 	# Instalación de PHP en el equipo que tendrá Jenkins, en este caso de ejemplo es el misma máquina virtual
 	# que contiene toda la práctica.
+	#Archivo que contiene un repositorio para la instalación de paquetes de PHP		 +    # update
 	$enhancers = [ 'php7.0', 'php7.0-xdebug', 'php7.0-xsl', 'php7.0-dom', 'php7.0-zip', 'php7.0-mbstring','phpunit', 'php_codesniffer', 'phploc','pdepend','phpmd','phpcpd','php-codebrowse','phpdox']
+	file { '/etc/apt/sources.list.d/ondrej-ubuntu-php-xenial.list':
+        content => "deb http://ppa.launchpad.net/ondrej/php/ubuntu xenial main\n",
+        mode    => '0644',
+       owner   => root,
+       group   => root,
+	} ->
 	package { $enhancers: 
 		ensure => installed,
 		require => Exec['apt-get update'],
@@ -73,7 +80,9 @@ class jenkins {
 	#Instalación del aprovisionamiento de paquetes composer de PHP
 	exec { "install_php_composer":
 		cwd         => "/tmp",
-		command     => "php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer && rm -f /tmp/composer-setup.php && sudo chown -R jenkins:jenkins /var/lib/jenkins/.composer",
+		user        => "jenkins",
+		environment => ["HOME=/var/lib/jenkins"],
+		command     => "php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && php composer-setup.php --install-dir=/usr/local/bin --filename=composer && rm -f /tmp/composer-setup.php",
 		path    => ['/usr/bin', '/usr/sbin', '/bin'],
 	}		
 }
