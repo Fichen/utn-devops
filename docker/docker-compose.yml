@@ -1,6 +1,6 @@
 version: '2'
 services:
-  web_server:
+  php:
     container_name: apache2_php
     build: .
     volumes:
