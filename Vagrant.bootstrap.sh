@@ -1,9 +1,10 @@
 #!/bin/bash
 
-#Aprovisionamiento de software
-
 #Actualizo los paquetes de la maquina virtual
 sudo apt-get update -y ;
+
+#Aprovisionamiento de software
+sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common dos2unix linux-image-extra-$(uname -r) linux-image-extra-virtual
 
 # Directorio para los archivos de la base de datos MySQL. El servidor de la base de datos 
 # es instalado mediante una imagen de Docker. Esto está definido en el archivo
@@ -44,6 +45,7 @@ sudo git checkout unidad-2;
 wget https://apt.puppetlabs.com/puppet5-release-xenial.deb
 sudo dpkg -i puppet5-release-xenial.deb
 sudo apt update
+
 
 # Instalación de master
 sudo apt-get install -y puppet-lint puppetmaster

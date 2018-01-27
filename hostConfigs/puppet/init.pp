@@ -17,15 +17,10 @@ exec { 'agrego-repositorio':
   command => '/usr/bin/add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable" && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -'  
 }
 
-# Aprovisionamiento de software útil para docker y la aplicación
-exec { 'docker_dependences':                    
-  command => '/usr/bin/apt-get install -y apt-transport-https ca-certificates curl software-properties-common dos2unix linux-image-extra-$(uname -r) linux-image-extra-virtual'
-}
-
 # Instalación del paquete docker. Tambien es para ejemplicar que se puede declarar
 # como requisito que se ejecuten una serie de comandos antes de la instalación
 package { 'docker-ce':
-  require => Exec['apt-update','agrego-repositorio','apt-update','docker_dependences'],       
+  require => Exec['apt-update','agrego-repositorio','apt-update'],       
   ensure => installed,
 }
 
