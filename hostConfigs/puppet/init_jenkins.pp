@@ -48,7 +48,6 @@ class jenkins {
 		require => Exec['reload-systemctl']
     }
 	
-	### Agregado unidad 4
 	user { 'jenkins':
 	    ensure	=> present,
 	    password => '$1$hrl1RNSP$DoKnhDdeCLlW.QJGLY8dj1' #utndevops
@@ -65,24 +64,27 @@ class jenkins {
 	# Instalación de PHP en el equipo que tendrá Jenkins, en este caso de ejemplo es el misma máquina virtual
 	# que contiene toda la práctica.
 	#Archivo que contiene un repositorio para la instalación de paquetes de PHP		 +    # update
-	$enhancers = [ 'php7.0', 'php7.0-xdebug', 'php7.0-xsl', 'php7.0-dom', 'php7.0-zip', 'php7.0-mbstring','phpunit', 'php_codesniffer', 'phploc','pdepend','phpmd','phpcpd','php-codebrowse','phpdox']
+	$enhancers = [ 'php7.0', 'php7.0-xdebug', 'php7.0-xsl', 'php7.0-dom', 'php7.0-zip', 'php7.0-mbstring','phpunit', 'php-codesniffer', 'phploc','pdepend','phpmd','phpcpd','phpdox']
 	file { '/etc/apt/sources.list.d/ondrej-ubuntu-php-xenial.list':
         content => "deb http://ppa.launchpad.net/ondrej/php/ubuntu xenial main\n",
         mode    => '0644',
-       owner   => root,
-       group   => root,
+        owner   => root,
+        group   => root,
+	} ->
+	exec { "update_sources_apt_php": 
+		path	=> ['/usr/bin', '/usr/sbin','/bin' ],
+		command => '/usr/bin/apt-get update',
 	} ->
 	package { $enhancers: 
 		ensure => installed,
-		require => Exec['apt-get update'],
+	    install_options => ['--allow-unauthenticated', '-f'],
 	}
 
 	#Instalación del aprovisionamiento de paquetes composer de PHP
 	exec { "install_php_composer":
 		cwd         => "/tmp",
-		user        => "jenkins",
 		environment => ["HOME=/var/lib/jenkins"],
-		command     => "php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && php composer-setup.php --install-dir=/usr/local/bin --filename=composer && rm -f /tmp/composer-setup.php",
+		command     => "curl -sS https://getcomposer.org/installer | php && sudo mv /tmp/composer.phar /usr/local/bin/composer",
 		path    => ['/usr/bin', '/usr/sbin', '/bin'],
 	}		
 }
