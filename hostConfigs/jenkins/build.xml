@@ -42,16 +42,7 @@
 
   <property name="lint.done" value="true"/>
  </target>
-
-  <target name="phpunit-ci"
-         unless="phpunit.done"
-         depends="prepare"
-         description="Run unit tests with PHPUnit">
-  <exec executable="${phpunit}"  taskname="phpunit">
-   <arg value="--configuration"/>
-   <arg path="${basedir}/myapp/phpunit.xml.dist"/>
-  </exec>
-
+ 
   <property name="phpunit.done" value="true"/>
  </target>
 
