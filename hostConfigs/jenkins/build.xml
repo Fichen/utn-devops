@@ -42,9 +42,6 @@
 
   <property name="lint.done" value="true"/>
  </target>
- 
-  <property name="phpunit.done" value="true"/>
- </target>
 
  <target name="phpunit"
          unless="phpunit.done"
