@@ -1,7 +1,7 @@
 class jenkins {
     # get key
     exec { 'install_jenkins_key':
-        command => '/usr/bin/wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | apt-key add - ',
+        command => '/usr/bin/wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -',
     } 
 
 	# source file
@@ -21,12 +21,8 @@ class jenkins {
     } ->
 	
     # jenkins package
-    package { 'jenkins':
-        ensure  => installed,
-        require => [
-			File['/etc/apt/sources.list.d/jenkins.list'],
-			Exec['apt-get update']
-		]
+	exec { 'install_apt_jenkins':
+        command => '/usr/bin/apt-get install openjdk-8-jre jenkins',
     } -> #Reemplazo el puerto de jenkins para que este escuchando en el 8082
 	exec { 'replace_jenkins_port':
 		command => "/bin/sed -i -- 's/HTTP_PORT=8080/HTTP_PORT=8082/g' /etc/default/jenkins",
