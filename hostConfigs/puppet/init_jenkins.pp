@@ -57,7 +57,7 @@ class jenkins {
 	#Además esta como ejemplo la utilización de variables en Puppet: ${jenkins_pwd}
 	exec { "install_jenkins_cli_and_plugins":
 		cwd         => "/tmp",
-		command     => "wget http://127.0.0.1:8082/jnlpJars/jenkins-cli.jar && java -jar jenkins-cli.jar -s http://127.0.0.1:8082 install-plugin checkstyle cloverphp crap4j dry htmlpublisher jdepend plot pmd violations warnings xunit git greenballs --username ${jenkins_usr} --password ${jenkins_pwd} && rm -f /tmp/jenkins-cli.jar",
+		command     => "wget http://127.0.0.1:8082/jnlpJars/jenkins-cli.jar && java -jar jenkins-cli.jar -s http://127.0.0.1:8082 install-plugin checkstyle cloverphp crap4j dry htmlpublisher jdepend plot pmd violations warnings xunit git greenballs && rm -f /tmp/jenkins-cli.jar",
 		path    => ['/usr/bin', '/usr/sbin','/bin' ],
 	}
 	
