@@ -10,6 +10,13 @@ sudo apt-get install -y apache2
 
 ### Configuración del entorno ###
 
+##Genero una partición swap. Previene errores de falta de memoria
+mkdir /swapfile
+cd /swapfile
+sudo dd if=/dev/zero of=swap bs=1024 count=2000000
+sudo mkswap -f  swap
+sudo swapon swap
+
 # ruta raíz del servidor web
 APACHE_ROOT="/var/www";
 # ruta de la aplicación
