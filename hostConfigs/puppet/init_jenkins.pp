@@ -1,14 +1,6 @@
 class jenkins {
 
-	$jenkins_pwd = 'utndevops'
-	$jenkins_usr = 'admin'
-
-    # get key
-    exec { 'install_jenkins_key':
-        command => '/usr/bin/wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | apt-key add - ',
-    } 
-
-	# source file
+    # source file
     file { '/etc/apt/sources.list.d/jenkins.list':
         content => "deb https://pkg.jenkins.io/debian-stable binary/\n",
 		ensure => present,
@@ -16,13 +8,14 @@ class jenkins {
         owner   => root,
         group   => root,
         require => Exec['install_jenkins_key'],
-    } -> #ordeno la secuencia de pasos en el tiempo mediante el operador "->".
-		 # se utiliza para encadenar semanticamente distintas declaraciones	
+    }
+	
     # update
     exec { 'apt-get update':
         command => '/usr/bin/apt-get update',
-        #require => File['/etc/apt/sources.list.d/jenkins.list'],
-    } ->
+        require => File['/etc/apt/sources.list.d/jenkins.list'],
+    }
+	
     # jenkins package
     package { 'jenkins':
         ensure  => installed,
@@ -54,7 +47,6 @@ class jenkins {
 	}
 	
 	# Instalo los plugins necesarios de Jenkins para ejecutar Integración Continua con PHP
-	#Además esta como ejemplo la utilización de variables en Puppet: ${jenkins_pwd}
 	exec { "install_jenkins_cli_and_plugins":
 		cwd         => "/tmp",
 		command     => "wget http://127.0.0.1:8082/jnlpJars/jenkins-cli.jar && java -jar jenkins-cli.jar -s http://127.0.0.1:8082 install-plugin checkstyle cloverphp crap4j dry htmlpublisher jdepend plot pmd violations warnings xunit git greenballs && rm -f /tmp/jenkins-cli.jar",
@@ -62,8 +54,8 @@ class jenkins {
 	}
 	
 	# Instalación de PHP en el equipo que tendrá Jenkins, en este caso de ejemplo es el misma máquina virtual
-	# que contiene toda la práctica.
-	#Archivo que contiene un repositorio para la instalación de paquetes de PHP		 +    # update
+	# que contiene toda la práctica. Los paquetes de PHP se encuentran listados en la variable $enhancers.
+	# Generación de un archivo que contiene un repositorio para la instalación de paquetes de PHP # update
 	$enhancers = [ 'php7.0', 'php7.0-xdebug', 'php7.0-xsl', 'php7.0-dom', 'php7.0-zip', 'php7.0-mbstring','phpunit', 'php-codesniffer', 'phploc','pdepend','phpmd','phpcpd','phpdox','ant','php7.2-xml']
 	file { '/etc/apt/sources.list.d/ondrej-ubuntu-php-xenial.list':
         content => "deb http://ppa.launchpad.net/ondrej/php/ubuntu xenial main\n",
@@ -74,13 +66,13 @@ class jenkins {
 	exec { "update_sources_apt_php": 
 		path	=> ['/usr/bin', '/usr/sbin','/bin' ],
 		command => '/usr/bin/apt-get update',
-	} ->
+	} -> # Instalación de paquetes PHP
 	package { $enhancers: 
 		ensure => installed,
 	    install_options => ['--allow-unauthenticated', '-f'],
 	}
 
-	#Instalación del aprovisionamiento de paquetes composer de PHP
+	#Instalación del aprovisionamiento de paquetes composer de PHP. Ejemplo de una instalación específica 
 	exec { "install_php_composer":
 		cwd         => "/tmp",
 		environment => ["HOME=/var/lib/jenkins"],

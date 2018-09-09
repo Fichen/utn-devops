@@ -1,6 +1,6 @@
 version: '2'
 services:
-  web_server:
+  php:
     container_name: apache2_php
     build: .
     volumes:
@@ -10,7 +10,7 @@ services:
     depends_on:
       - db_server
   db_server:
-    image: mysql
+    image: mysql:5.7
     container_name: mysql
     environment:
       - MYSQL_DATABASE=devops_app #creará una base de datos con ese nombre

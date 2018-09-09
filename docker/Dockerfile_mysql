@@ -1,4 +1,4 @@
-FROM mysql
+FROM mysql:5.7
 
 ENV MYSQL_DATABASE devops_app
 ENV MYSQL_ROOT_PASSWORD root
