@@ -7,7 +7,6 @@ class jenkins {
         mode    => '0644',
         owner   => root,
         group   => root,
-        require => Exec['install_jenkins_key'],
     }
 	
     # update
