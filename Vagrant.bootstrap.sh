@@ -18,6 +18,9 @@ sudo mkdir -p /var/db/mysql
 # Muevo el archivo de configuración de firewall al lugar correspondiente
 sudo mv -f /tmp/ufw /etc/default/ufw
 
+##Swap
+sudo swapon /swapdir/swapfile
+
 # Configuración applicación
 # ruta raíz del servidor web
 APACHE_ROOT="/var/www";
