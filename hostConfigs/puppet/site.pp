@@ -10,7 +10,6 @@ node 'utn-devops' {
 
 # Incluyo lo definido en la clase docker_install correspondiente al archivo
 # utn-devops/hostConfigs/puppet/init.pp
-include 'docker_install'
 include 'jenkins'
 
 # Instalación de Jenkins. Solo lo instalo si el nodo cliente contiene los
