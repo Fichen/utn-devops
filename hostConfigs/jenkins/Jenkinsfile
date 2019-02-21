@@ -1,0 +1,27 @@
+node {
+    stage('Prepare') {
+        steps {
+            sh 'composer install'
+            sh 'rm -rf build/logs'
+            sh 'mkdir build/logs'
+            sh 'mkdir build/phpdox'
+        }
+    }
+    stage('Build') { 
+        steps { 
+            sh 'vendor/bin/parallel-lint --exclude vendor/ .' 
+            
+        } 
+    }
+    stage('Test') {
+        steps {
+            sh 'vendor/bin/phpunit -c build/phpunit.xml || exit 0'
+                step([
+                    $class: 'XUnitBuilder',
+                    thresholds: [[$class: 'FailedThreshold', unstableThreshold: '1']],
+                    tools: [[$class: 'JUnitType', pattern: 'build/logs/junit.xml']]
+                ])
+                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'build/coverage', reportFiles: 'index.html', reportName: 'Coverage Report', reportTitles: ''])
+        }
+    }
+}
