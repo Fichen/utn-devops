@@ -1,9 +1,4 @@
 class docker_install {
-# Actualización de repositorio. La declaracion de un bloque exec permite definir
-# comandos que ejecutara el nodo cliente de Puppet
-exec { 'apt-update':                    
-  command => '/usr/bin/apt-get update'  
-}
 ## Este archivo corresponde al módulo de configuración de puppet, el cual define
 # una clase con ciertas especificaciones para instalación y aprovisionamiento. Si bien
 # esta nombrado como docker install (instalación de docker) tiene una
@@ -15,6 +10,11 @@ exec { 'apt-update':
 # Agrego el repositorio para la instalación de Docker
 exec { 'agrego-repositorio':                    
   command => '/usr/bin/add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable" && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -'  
+} ->
+# Actualización de repositorio. La declaracion de un bloque exec permite definir
+# comandos que ejecutara el nodo cliente de Puppet
+exec { 'apt-update':                    
+  command => '/usr/bin/apt-get update'  
 }
 
 # Instalación del paquete docker. Tambien es para ejemplicar que se puede declarar

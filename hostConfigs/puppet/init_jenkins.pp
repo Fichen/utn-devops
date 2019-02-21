@@ -22,7 +22,8 @@ class jenkins {
     }
 
     #install jenkins
-    $enhancers = [ 'openjdk-8-jre', 'jenkins' ]
+    #$enhancers = [ 'openjdk-8-jre', 'jenkins' ]
+    $enhancers = [ 'jenkins' ]
 
     package { $enhancers:
         ensure => 'installed',
@@ -41,7 +42,7 @@ class jenkins {
     # aseguro que el servicio de jenkins este activo
     service { 'jenkins':
         ensure  => running,
-            enable  => "true",
-                require => Exec['reload-systemctl']
+        enable  => "true",
+        require => Exec['reload-systemctl']
     }
 }
