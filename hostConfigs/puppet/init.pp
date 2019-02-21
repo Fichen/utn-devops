@@ -1,9 +1,4 @@
 class docker_install {
-# Actualización de repositorio. La declaracion de un bloque exec permite definir
-# comandos que ejecutara el nodo cliente de Puppet
-exec { 'apt-update':                    
-  command => '/usr/bin/apt-get update'  
-}
 ## Este archivo corresponde al módulo de configuración de puppet, el cual define
 # una clase con ciertas especificaciones para instalación y aprovisionamiento. Si bien
 # esta nombrado como docker install (instalación de docker) tiene una
@@ -15,17 +10,17 @@ exec { 'apt-update':
 # Agrego el repositorio para la instalación de Docker
 exec { 'agrego-repositorio':                    
   command => '/usr/bin/add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable" && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -'  
-}
-
-# Aprovisionamiento de software útil para docker y la aplicación
-exec { 'docker_dependences':                    
-  command => '/usr/bin/apt-get install -y apt-transport-https ca-certificates curl software-properties-common dos2unix linux-image-extra-$(uname -r) linux-image-extra-virtual'
+} ->
+# Actualización de repositorio. La declaracion de un bloque exec permite definir
+# comandos que ejecutara el nodo cliente de Puppet
+exec { 'apt-update':                    
+  command => '/usr/bin/apt-get update'  
 }
 
 # Instalación del paquete docker. Tambien es para ejemplicar que se puede declarar
 # como requisito que se ejecuten una serie de comandos antes de la instalación
 package { 'docker-ce':
-  require => Exec['apt-update','agrego-repositorio','apt-update','docker_dependences'],       
+  require => Exec['apt-update','agrego-repositorio','apt-update'],       
   ensure => installed,
 }
 
@@ -38,10 +33,10 @@ package { 'docker-compose':
 # Aprovisionamiento de configuración para la aplicación. Con esta declaracion
 # se transfiere un archivo del servidor Puppet Master al nodo que contiene el agente
 file { "/var/www/utn-devops-app/myapp/.env":
-	mode => "0644",
+  mode => "0644",
     owner => 'root',
     group => 'root',
-	ensure => 'present', 
+  ensure => 'present', 
     source => 'puppet:///modules/docker_install/env',
 }
 
