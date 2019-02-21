@@ -55,7 +55,7 @@ class jenkins {
 	# Instalación de PHP en el equipo que tendrá Jenkins, en este caso de ejemplo es el misma máquina virtual
 	# que contiene toda la práctica. Los paquetes de PHP se encuentran listados en la variable $enhancers.
 	# Generación de un archivo que contiene un repositorio para la instalación de paquetes de PHP # update
-	$enhancers = [ 'php7.0', 'php7.0-xdebug', 'php7.0-xsl', 'php7.0-dom', 'php7.0-zip', 'php7.0-mbstring','phpunit', 'php-codesniffer', 'phploc','pdepend','phpmd','phpcpd','phpdox','ant','php7.2-xml']
+	$enhancers = [ 'php7.3', 'php7.3-xdebug', 'php7.3-xsl', 'php7.3-dom', 'php7.3-zip', 'php7.3-mbstring','phpunit', 'php-codesniffer', 'phploc','pdepend','phpmd','phpcpd','phpdox','ant','php7.2-xml','php7.3-xml','php7.3-xml','cd myapp && composer install'']
 	file { '/etc/apt/sources.list.d/ondrej-ubuntu-php-xenial.list':
         content => "deb http://ppa.launchpad.net/ondrej/php/ubuntu xenial main\n",
         mode    => '0644',
