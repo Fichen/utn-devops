@@ -14,7 +14,7 @@ pipeline {
             steps {
                 sh 'find . -path ./utn-devops-app/myapp/vendor -prune -o -name \\*.php -exec php -l "{}" \\;'
                 retry(2) {
-                    sh 'cd utn-devops-app/myapp && php -dmemory_limit=750M /usr/local/bin/composer update --no-scripts --prefer-dist'
+                    sh 'cd utn-devops-app/myapp && sudo php -dmemory_limit=750M /usr/local/bin/composer update --no-scripts --prefer-dist'
                 }
             }
         }
