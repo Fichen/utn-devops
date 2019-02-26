@@ -4,11 +4,11 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
-                sh 'chmod 777 ./utn-devops-app/myapp/bootstrap/cache/'
                 sh 'git clone https://github.com/Fichen/utn-devops-app.git || true'
                 sh 'cd utn-devops-app'
                 sh 'sudo git checkout unidad-2 || true'
                 sh 'cd myapp && sudo composer install ||true'
+                sh 'chmod 777 ./utn-devops-app/myapp/bootstrap/cache/'
             }
         }
         stage('Build') {
