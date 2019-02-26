@@ -1,5 +1,12 @@
 #!/bin/bash
 
+sudo mkdir /swapdir
+cd /swapdir
+sudo dd if=/dev/zero of=/swapdir/swapfile bs=1024 count=2000000
+sudo mkswap -f  /swapdir/swapfile
+sudo chmod 600 /swapdir/swapfile
+sudo swapon swapfile
+
 #Aprovisionamiento de software
 
 ###### Configuración de Puppet ######
@@ -21,6 +28,7 @@ sudo mv -f /tmp/jenkins_default /etc/puppet/modules/jenkins/files/jenkins_defaul
 sudo mv -f /tmp/jenkins_init_d /etc/puppet/modules/jenkins/files/jenkins_init_d
 
 sudo dos2unix /etc/puppet/modules/jenkins/files/jenkins_init_d
+
 
 # al detener e iniciar el servicio se regeneran los certificados 
 sudo service puppetmaster stop && service puppetmaster start

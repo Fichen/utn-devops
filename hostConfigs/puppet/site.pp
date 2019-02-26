@@ -1,5 +1,5 @@
 # Configuración específica para los nodos por defectos. En este caso no es ninguna
-node default { }
+node default {}
 
 # Configuración para un nodo específico. En este caso el nuestro que tiene como nombre
 # de host 'utn-devops'. En este caso el nombre de host esta dado por el archivo que se
@@ -11,7 +11,7 @@ node 'utn-devops' {
 # Incluyo lo definido en la clase docker_install correspondiente al archivo
 # utn-devops/hostConfigs/puppet/init.pp
 include 'docker_install'
-include 'jenkins'
+#include 'jenkins'
 
 # Instalación de Jenkins. Solo lo instalo si el nodo cliente contiene los
 # sistemas operativos Debian o Ubuntu
