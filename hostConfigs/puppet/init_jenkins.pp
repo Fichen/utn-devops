@@ -22,8 +22,8 @@ class jenkins {
     }
 
     #install jenkins
-    #$enhancers = [ 'openjdk-8-jre', 'jenkins' ]
-    $enhancers = [ 'jenkins' ]
+    $enhancers = [ 'openjdk-8-jre', 'jenkins' ]
+    #$enhancers = [ 'jenkins' ]
 
     package { $enhancers:
         ensure => 'installed',
