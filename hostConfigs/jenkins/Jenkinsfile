@@ -13,7 +13,10 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'find . -path ./utn-devops-app/myapp/vendor -prune -o -name \\*.php -exec php -l "{}" \\;' 
+                sh 'find . -path ./utn-devops-app/myapp/vendor -prune -o -name \\*.php -exec php -l "{}" \\;'
+                retry(2) {
+                    sh 'cd utn-devops-app/myapp && php -dmemory_limit=750M /usr/local/bin/composer update --no-scripts --prefer-dist'
+                }
             }
         }
         stage('Test') {
