@@ -20,6 +20,10 @@ sudo mv -f /tmp/ufw /etc/default/ufw
 
 ##Swap
 sudo swapon /swapdir/swapfile
+echo "/swapdir/swapfile       none    swap    sw      0       0" | sudo tee -a /etc/fstab /etc/fstab
+sudo sysctl vm.swappiness=10
+echo vm.swappiness = 10 | sudo tee -a /etc/sysctl.conf
+
 
 # Configuración applicación
 # ruta raíz del servidor web
