@@ -17,6 +17,11 @@ sudo dd if=/dev/zero of=/swapdir/swapfile bs=1024 count=2000000
 sudo mkswap -f  /swapdir/swapfile
 sudo chmod 600 /swapdir/swapfile
 sudo swapon swapfile
+echo "/swapdir/swapfile       none    swap    sw      0       0" | sudo tee -a /etc/fstab /etc/fstab
+sudo sysctl vm.swappiness=10
+echo vm.swappiness = 10 | sudo tee -a /etc/sysctl.conf
+
+
 
 # ruta raíz del servidor web
 APACHE_ROOT="/var/www";
