@@ -12,13 +12,13 @@ sudo apt-get install -y apt-transport-https ca-certificates curl software-proper
 sudo mkdir -p /var/db/mysql
 
 # Directorio para scripts
-sudo mkdir /scripts
+#sudo mkdir /scripts
 # Muevo scripts para el inicio y la detención de los contenedores de Docker
-sudo mv -f /tmp/docker-stop.sh /scripts
-sudo mv -f /tmp/docker-start.sh /scripts
-sudo chmod 755 /scripts/*
-sudo dos2unix /scripts/docker-start.sh
-sudo dos2unix /scripts/docker-stop.sh
+#sudo mv -f /tmp/docker-stop.sh /scripts
+#sudo mv -f /tmp/docker-start.sh /scripts
+#sudo chmod 755 /scripts/*
+#sudo dos2unix /scripts/docker-start.sh
+#sudo dos2unix /scripts/docker-stop.sh
 
 # Muevo el archivo de configuración de firewall al lugar correspondiente
 sudo mv -f /tmp/ufw /etc/default/ufw
