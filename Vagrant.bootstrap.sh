@@ -2,7 +2,7 @@
 
 #Aprovisionamiento de software
 
-#Actualizo los paquetes de la maquina virtual
+#Actualizo los paquetes disponibles de la VM
 sudo apt-get update -y
 
 #Desintalo el servidor web instalado previamente en la unidad 1,
