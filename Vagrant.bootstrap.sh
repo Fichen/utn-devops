@@ -24,15 +24,15 @@ if [ ! -f "/swapdir/swapfile" ]; then
 fi
 
 # ruta raíz del servidor web
-APACHE_ROOT="/var/www";
+APACHE_ROOT="/var/www"
 # ruta de la aplicación
-APP_PATH="$APACHE_ROOT/utn-devops-app";
+APP_PATH="$APACHE_ROOT/utn-devops-app"
 
 
 ## configuración servidor web
 #copio el archivo de configuración del repositorio en la configuración del servidor web
 if [ -f "/tmp/devops.site.conf" ]; then
-	echo "Copio el archivo de configuracion de apache";
+	echo "Copio el archivo de configuracion de apache"
 	sudo mv /tmp/devops.site.conf /etc/apache2/sites-available
 	#activo el nuevo sitio web
 	sudo a2ensite devops.site.conf
@@ -46,10 +46,10 @@ fi
 
 # descargo la app del repositorio
 if [ ! -d "$APP_PATH" ]; then
-	echo "clono el repositorio";
-	cd $APACHE_ROOT;
-	sudo git clone https://github.com/Fichen/utn-devops-app.git;
-	cd $APP_PATH;
-	sudo git checkout unidad-1;
+	echo "clono el repositorio"
+	cd $APACHE_ROOT
+	sudo git clone https://github.com/Fichen/utn-devops-app.git
+	cd $APP_PATH
+	sudo git checkout unidad-1
 fi
 
