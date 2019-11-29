@@ -41,7 +41,7 @@ if [ ! -x "$(command -v puppet)" ]; then
 	sudo systemctl restart ntp
 
   # Muevo el archivo de configuración de Puppet al lugar correspondiente
-  sudo mv -f /tmp/puppet-master.conf /etc/puppet/puppet.conf
+  sudo mv -f /tmp/puppet-master.conf $PUPPET_DIR/puppet.conf
 
   # elimino certificados de que se generan en la instalación.
   # no nos sirven ya que el certificado depende del nombre que se asigne al maestro
