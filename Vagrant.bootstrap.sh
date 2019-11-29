@@ -73,6 +73,7 @@ fi
 sudo ufw allow 8140/tcp
 
 # al detener e iniciar el servicio se regeneran los certificados
+echo "Reiniciando servicios puppetmaster y puppet agent"
 sudo systemctl stop puppetmaster && sudo systemctl start puppetmaster
 sudo systemctl stop puppet && sudo systemctl start puppet
 
