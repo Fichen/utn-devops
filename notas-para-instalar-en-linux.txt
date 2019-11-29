@@ -1,0 +1,12 @@
+Install virtualbox 
+
+wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
+
+sudo add-apt-repository "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib"
+sudo apt install make gcc perl
+sudo /sbin/vboxconfig
+
+
+Install vagrant
+wget https://releases.hashicorp.com/vagrant/2.2.6/vagrant_2.2.6_x86_64.deb
+sudo dpkg -i vagrant_2.2.6_x86_64.deb
