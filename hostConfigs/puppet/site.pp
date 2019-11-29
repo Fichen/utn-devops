@@ -6,7 +6,7 @@ node default { }
 # encuentra en "utn-devops/hostConfigs/etc_hosts.txt". En una configuración más orientada
 # a la realidad, y no para un ejemplo como es este caso, se utilizan servidores de nombre
 # de dominio (DNS)
-node 'utn-devops' {
+node 'utn-devops.localhost' {
 
 # Incluyo lo definido en la clase docker_install correspondiente al archivo
 # utn-devops/hostConfigs/puppet/init.pp

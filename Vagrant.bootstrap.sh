@@ -4,14 +4,7 @@
 sudo apt-get update -y
 
 #Aprovisionamiento de software
-sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common dos2unix linux-image-extra-$(uname -r) linux-image-extra-virtual
-
-# Directorio para los archivos de la base de datos MySQL. El servidor de la base de datos
-# es instalado mediante una imagen de Docker. Esto está definido en el archivo
-# docker-compose.yml
-if [ ! -d "/var/db/mysql" ]; then
-	sudo mkdir -p /var/db/mysql
-fi
+sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common linux-image-extra-virtual-hwe-$(lsb_release -r |awk  '{ print $2 }') linux-image-extra-virtual
 
 # Muevo el archivo de configuración de firewall al lugar correspondiente
 if [ -f "/tmp/ufw" ]; then
@@ -24,72 +17,70 @@ if [ -f "/tmp/etc_hosts.txt" ]; then
 	sudo mv -f /tmp/etc_hosts.txt /etc/hosts
 fi
 
-## Configuración applicación
-# ruta raíz
-APP_ROOT="/var/www"
-#ruta aplicación
-APP_PATH=$APP_PATH . "/utn-devops-app"
-
-sudo mkdir $APP_ROOT
-# descargo la app del repositorio
-cd $APP_ROOT
-sudo git clone https://github.com/Fichen/utn-devops-app.git
-cd $APP_PATH
-sudo git checkout unidad-2
-
-
 ###### Instalación de Puppet ######
 #configuración de repositorio
 if [ ! -x "$(command -v puppet)" ]; then
-    wget https://apt.puppetlabs.com/puppet5-release-xenial.deb
-    sudo dpkg -i puppet5-release-xenial.deb
-    sudo apt update
 
+	#### Instalacion puppet master
+  #Directorios
+  PUPPET_DIR="/etc/puppet"
+  ENVIRONMENT_DIR="${PUPPET_DIR}/code/environments/production"
+  PUPPET_MODULES="${ENVIRONMENT_DIR}/modules"
 
-    # Instalación de master
-    sudo apt-get install -y puppet-lint puppetmaster
+	sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
+ 	sudo apt-get update
+	sudo apt install -y puppetmaster
 
-    # Instalación de agente. Esto se debiera hacer en otro equipo pero se realiza aquí para simplificar
-    # el ejemplo
-    sudo apt-get install -y puppet
+	#### Instalacion puppet agent
+	sudo apt install -y puppet
 
-    # Muevo el archivo de configuración de Puppet al lugar correspondiente
-    sudo mv -f /tmp/puppet-master.conf /etc/puppet/puppet.conf
+  # Esto es necesario en entornos reales para posibilitar la sincronizacion
+  # entre master y agents
+	sudo timedatectl set-timezone America/Argentina/Buenos_Aires
+	sudo apt-get -y install ntp
+	sudo systemctl restart ntp
 
-    # elimino certificados de que se generan en la instalación.
-    # no nos sirven ya que el certificado depende del nombre que se asigne al maestro
-    # y en este ejemplo se modifico.
-    sudo rm -rf /var/lib/puppet/ssl
+  # Muevo el archivo de configuración de Puppet al lugar correspondiente
+  sudo mv -f /tmp/puppet-master.conf /etc/puppet/puppet.conf
 
-    # Agrego el usuario puppet al grupo de sudo, para no necesitar password al reiniciar un servicio
-    sudo usermod -a -G sudo,puppet puppet
+  # elimino certificados de que se generan en la instalación.
+  # no nos sirven ya que el certificado depende del nombre que se asigne al maestro
+  # y en este ejemplo se modifico.
+  sudo rm -rf /var/lib/puppet/ssl
 
-    # Estructura de directorios para crear el modulo de Puppet para Docker
-    sudo mkdir -p /etc/puppet/modules/docker_install/manifests
-    sudo mkdir /etc/puppet/modules/docker_install/files
+  # Agrego el usuario puppet al grupo de sudo, para no necesitar password al reiniciar un servicio
+  sudo usermod -a -G sudo,puppet puppet
 
-    # Lo mismo que el anterior pero para el modulo de Jenkins
-    sudo mkdir -p /etc/puppet/modules/jenkins/manifests
-    sudo mkdir /etc/puppet/modules/jenkins/files
+  # Estructura de directorios para crear el entorno de Puppet
+  sudo mkdir -p $ENVIRONMENT_DIR/{manifests,modules,hieradata}
+  sudo mkdir -p $PUPPET_MODULES/docker_install/{manifests,files}
 
-    # muevo los archivos que utiliza Puppet
-    sudo mv -f /tmp/site.pp /etc/puppet/manifests/
-    sudo mv -f /tmp/init.pp /etc/puppet/modules/docker_install/manifests/init.pp
-    sudo mv -f /tmp/env /etc/puppet/modules/docker_install/files
-    sudo mv -f /tmp/init_jenkins.pp /etc/puppet/modules/jenkins/manifests/init.pp
-    sudo mv -f /tmp/jenkins_default /etc/puppet/modules/jenkins/files/jenkins_default
-    sudo mv -f /tmp/jenkins_init_d /etc/puppet/modules/jenkins/files/jenkins_init_d
+  # Estructura de directorios para crear el modulo de Jenkins
+  sudo mkdir -p $PUPPET_MODULES/jenkins/{manifests,files}
 
-    sudo dos2unix /etc/puppet/modules/jenkins/files/jenkins_init_d
+  # muevo los archivos que utiliza Puppet
+  sudo mv -f /tmp/site.pp $ENVIRONMENT_DIR/manifests #/etc/puppet/manifests/
+  sudo mv -f /tmp/init.pp $PUPPET_MODULES/docker_install/manifests/init.pp
+  sudo mv -f /tmp/env $PUPPET_MODULES/docker_install/files
+  sudo mv -f /tmp/init_jenkins.pp $PUPPET_MODULES/jenkins/manifests/init.pp
+  sudo mv -f /tmp/jenkins_default $PUPPET_MODULES/jenkins/files/jenkins_default
+  sudo mv -f /tmp/jenkins_init_d $PUPPET_MODULES/jenkins/files/jenkins_init_d
+
+  sudo cp /usr/share/doc/puppet/examples/etckeeper-integration/*commit* $PUPPET_DIR
+  sudo chmod 755 $PUPPET_DIR/etckeeper-commit-p*
 fi
 
+sudo ufw allow 8140/tcp
+
 # al detener e iniciar el servicio se regeneran los certificados
-sudo service puppetmaster stop && service puppetmaster start
+sudo systemctl stop puppetmaster && sudo systemctl start puppetmaster
+sudo systemctl stop puppet && sudo systemctl start puppet
+
 
 # limpieza de configuración del dominio utn-devops.localhost es nuestro nodo agente.
 # en nuestro caso es la misma máquina
-sudo puppet node clean utn-devops
+sudo puppet node clean utn-devops.localhost
 
 # Habilito el agente
-sudo puppet agent --certname utn-devops --enable
+sudo puppet agent --certname utn-devops.localhost --enable
 
