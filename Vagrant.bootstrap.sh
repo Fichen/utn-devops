@@ -13,7 +13,7 @@ if [ ! -f "/swapdir/swapfile" ]; then
 	echo vm.swappiness = 10 | sudo tee -a /etc/sysctl.conf
 fi
 
-###### Configuración de Puppet ######
+###### Puppet ######
 #Directorios
 PUPPET_DIR="/etc/puppet"
 ENVIRONMENT_DIR="${PUPPET_DIR}/code/environments/production"
