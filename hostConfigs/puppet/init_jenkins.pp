@@ -8,13 +8,13 @@ class jenkins {
         owner   => root,
         group   => root,
     }
-    
+
     # update
     exec { 'apt-get update':
         command => '/usr/bin/apt-get update',
         require => File['/etc/apt/sources.list.d/jenkins.list'],
     }
-    
+
     # jenkins package
     package { 'jenkins':
         ensure  => installed,
@@ -32,48 +32,48 @@ class jenkins {
         notify => Service['jenkins'],
     }
 
-    
+
     # Notifico al gestor de servicios que un archivo cambio
     exec { 'reload-systemctl':
         command => '/bin/systemctl daemon-reload',
-    } 
-    
+    }
+
     # aseguro que el servicio de jenkins este activo
     service { 'jenkins':
         ensure  => running,
         enable  => "true",
         require => Exec['reload-systemctl']
     }
-    
+
     user { 'jenkins':
         ensure  => present,
         password => '$1$hrl1RNSP$DoKnhDdeCLlW.QJGLY8dj1' #utndevops
     }
-    
-    
+
+
     # Instalación de PHP en el equipo que tendrá Jenkins, en este caso de ejemplo es el misma máquina virtual
     # que contiene toda la práctica. Los paquetes de PHP se encuentran listados en la variable $enhancers.
     # Generación de un archivo que contiene un repositorio para la instalación de paquetes de PHP # update
     $enhancers = [ 'php7.3', 'php7.3-xdebug', 'php7.3-xsl', 'php7.3-dom', 'php7.3-zip', 'php7.3-mbstring','phpunit', 'php-codesniffer', 'phploc','pdepend','phpmd','phpcpd','phpdox','ant','php7.2-xml','php7.3-xml']
-    file { '/etc/apt/sources.list.d/ondrej-ubuntu-php-xenial.list':
-        content => "deb http://ppa.launchpad.net/ondrej/php/ubuntu xenial main\n",
+    file { '/etc/apt/sources.list.d/ondrej-ubuntu-php-bionic.list':
+        content => "deb http://ppa.launchpad.net/ondrej/php/ubuntu bionic main\n",
         mode    => '0644',
         owner   => root,
         group   => root,
     } ->
-    exec { "update_sources_apt_php": 
+    exec { "update_sources_apt_php":
         path    => ['/usr/bin', '/usr/sbin','/bin' ],
         command => '/usr/bin/apt-get update',
     } -> # Instalación de paquetes PHP
-    package { $enhancers: 
+    package { $enhancers:
         ensure => installed,
         install_options => ['--allow-unauthenticated', '-f'],
     }
-    #Instalación del aprovisionamiento de paquetes composer de PHP. Ejemplo de una instalación específica 
+    #Instalación del aprovisionamiento de paquetes composer de PHP. Ejemplo de una instalación específica
     exec { "install_php_composer":
         cwd         => "/tmp",
         environment => ["HOME=/var/lib/jenkins"],
         command     => "curl -sS https://getcomposer.org/installer | php && sudo mv /tmp/composer.phar /usr/local/bin/composer",
         path    => ['/usr/bin', '/usr/sbin', '/bin'],
-    }       
+    }
 }
