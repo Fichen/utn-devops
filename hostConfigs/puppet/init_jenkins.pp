@@ -7,6 +7,10 @@ class jenkins {
         mode    => '0644',
         owner   => root,
         group   => root,
+    } ->
+    # get key
+    exec { 'install_jenkins_key':
+        command => '/usr/bin/wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo /usr/bin/apt-key add -',
     }
 
     # update
@@ -60,6 +64,10 @@ class jenkins {
         mode    => '0644',
         owner   => root,
         group   => root,
+    } ->
+    exec { "add_key_php_repository":
+        path    => ['/usr/bin', '/usr/sbin','/bin' ],
+        command => '/usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E5267A6C'
     } ->
     exec { "update_sources_apt_php":
         path    => ['/usr/bin', '/usr/sbin','/bin' ],
