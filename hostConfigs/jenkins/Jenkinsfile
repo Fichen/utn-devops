@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        APP_DIR = 'myapp'
+        APP_DIR = 'utn-devops-app/myapp'
         DEFAULT_BRANCH = 'unidad-2'
     }
 
