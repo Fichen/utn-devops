@@ -16,7 +16,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh "find . -path ./${APP_DIR}/vendor -prune -o -name \\*.php -exec php -l "{}" \\;"
+                sh "find . -path ./${APP_DIR}/vendor -prune -o -name \\*.php -exec php -l \"{}\" \\;"
                 retry(2) {
                     sh 'cd ${APP_DIR} && sudo php -dmemory_limit=750M /usr/local/bin/composer update --no-scripts --prefer-dist'
                 }
