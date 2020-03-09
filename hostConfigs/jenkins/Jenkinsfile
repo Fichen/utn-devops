@@ -12,20 +12,20 @@ pipeline {
                 sh "git clone https://github.com/Fichen/utn-devops-app.git || true"
                 sh "cd ${APP_DIR} && sudo git checkout ${DEFAULT_BRANCH}"
                 sh "cd ${APP_DIR} && sudo /usr/local/bin/composer install"
-                sh "chmod 777 ./${APP_DIR}/bootstrap/cache/"
+                sh "chmod 777 ${APP_DIR}/bootstrap/cache/"
             }
         }
         stage('Build') {
             steps {
                 sh "find . -path ./${APP_DIR}/vendor -prune -o -name \\*.php -exec php -l \"{}\" \\;"
                 retry(2) {
-                    sh 'cd ${APP_DIR} && sudo php -dmemory_limit=750M /usr/local/bin/composer update --no-scripts --prefer-dist'
+                    sh "cd ${APP_DIR} && sudo php -dmemory_limit=750M /usr/local/bin/composer update --no-scripts --prefer-dist"
                 }
             }
         }
         stage('Test') {
             steps {
-                sh "./${APP_DIR}/vendor/bin/phpunit -c ./utn-devops-app/myapp/phpunit.xml"
+                sh "${APP_DIR}/vendor/bin/phpunit -c ${APP_DIR}/phpunit.xml"
             }
         }
         stage('Deploy') {
