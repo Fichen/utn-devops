@@ -19,6 +19,7 @@ Vagrant.configure("2") do |config|
   # solapen los puertos con los de nuestra equipo en el caso de que ese número de puerto este en uso.
 
   config.vm.network "forwarded_port", guest: 8082, host: 8082
+  config.vm.network "forwarded_port", guest: 8081, host: 8081
   config.vm.network "forwarded_port", guest: 4400, host: 4400
   # Puerto en que escuchar el servidor maestro de Puppet
   config.vm.network "forwarded_port", guest: 8140, host: 8140
