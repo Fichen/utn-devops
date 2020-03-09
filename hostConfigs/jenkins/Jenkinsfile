@@ -1,26 +1,37 @@
 pipeline {
     agent any
 
+    environment {
+        APP_DIR = 'myapp'
+        DEFAULT_BRANCH = 'unidad-2'
+    }
+
     stages {
         stage('Prepare') {
             steps {
-                sh 'git clone https://github.com/Fichen/utn-devops-app.git || true'
-                sh 'cd utn-devops-app && sudo git checkout unidad-2'
-                sh 'cd utn-devops-app/myapp && sudo /usr/local/bin/composer install'
-                sh 'chmod 777 ./utn-devops-app/myapp/bootstrap/cache/'
+                sh "sudo git checkout ${DEFAULT_BRANCH}"
+                sh "cd ${APP_DIR} && sudo /usr/local/bin/composer install"
+                sh "chmod 777 ./${APP_DIR}/bootstrap/cache/"
             }
         }
         stage('Build') {
             steps {
-                sh 'find . -path ./utn-devops-app/myapp/vendor -prune -o -name \\*.php -exec php -l "{}" \\;'
+                sh "find . -path ./${APP_DIR}/vendor -prune -o -name \\*.php -exec php -l "{}" \\;'
                 retry(2) {
-                    sh 'cd utn-devops-app/myapp && sudo php -dmemory_limit=750M /usr/local/bin/composer update --no-scripts --prefer-dist'
+                    sh 'cd ${APP_DIR} && sudo php -dmemory_limit=750M /usr/local/bin/composer update --no-scripts --prefer-dist'
                 }
             }
         }
         stage('Test') {
             steps {
-                sh './utn-devops-app/myapp/vendor/bin/phpunit -c ./utn-devops-app/myapp/phpunit.xml'
+                sh "./${APP_DIR}/vendor/bin/phpunit -c ./utn-devops-app/myapp/phpunit.xml"
+            }
+        }
+        stage('Deploy') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'deploy-app', usernameVariable: 'FUSER', passwordVariable: 'FPWD')]) {
+                    echo 'git ftp push --user $FUSER --passwd $FPWD -f --remote-root / --syncroot ./ --disable-epsv ftp://domain.com -v'
+                }
             }
         }
     }
