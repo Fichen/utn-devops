@@ -1,9 +1,16 @@
-127.0.0.1       utn-devops.localhost    utn-devops	puppet-server
 127.0.0.1       localhost
+10.0.0.10       puppet-master.utn-devops.localhost  puppet-master
+10.0.0.11       develop.utn-devops.localhost    develop
+10.0.0.12       test.utn-devops.localhost   test
+10.0.0.13       ci-server.utn-devops.localhost  ci-server
+
+# The following lines are desirable for IPv6 capable hosts
 ::1     ip6-localhost   ip6-loopback
 fe00::0 ip6-localnet
 ff00::0 ip6-mcastprefix
 ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 ff02::3 ip6-allhosts
-127.0.1.1       ubuntu-bionic64   ubuntu-bionic64
+
+#127.0.1.1       ci-server.utn-devops.localhost  ci-server
+127.0.1.1       ubuntu-bionic   ubuntu-bionic

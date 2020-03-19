@@ -6,15 +6,15 @@ services:
     volumes:
       - "/var/www/utn-devops-app:/var/www/html"
     ports:
-      - "8081:80" 
+      - "8081:80"
     depends_on:
       - db_server
   db_server:
     image: mysql:5.7
     container_name: mysql
     environment:
-      - MYSQL_DATABASE=devops_app #creará una base de datos con ese nombre
-      - MYSQL_ROOT_PASSWORD=root #clave de administrador del servidor MySQL
+      - MYSQL_DATABASE=${DB_DATABASE} #creará una base de datos con ese nombre
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD} #clave de administrador del servidor MySQL
     ports:
       - "4400:3306"
     volumes:

@@ -45,15 +45,19 @@ class jenkins {
     # aseguro que el servicio de jenkins este activo
     service { 'jenkins':
         ensure  => running,
-        enable  => "true",
-        require => Exec['reload-systemctl']
+        enable  => true,
     }
 
     user { 'jenkins':
         ensure  => present,
-        password => '$1$hrl1RNSP$DoKnhDdeCLlW.QJGLY8dj1' #utndevops
+        password => '$6$D1DhaT8j$MtKymPElAd8F7zFT/iWV2Z47HVSFtPqRR/VhCi85//aOQDrLv2SILkf/9Tx/VTdaCtkShoBtg24nWv2vepwld0' #utndevops
     }
 
+    file { 'jenkins-admin-user':
+        path => '/var/lib/jenkins/users'
+        ensure => present,
+        source => 'puppet:///jenkins/users',
+    }
 
     # Instalación de PHP en el equipo que tendrá Jenkins, en este caso de ejemplo es el misma máquina virtual
     # que contiene toda la práctica. Los paquetes de PHP se encuentran listados en la variable $enhancers.
