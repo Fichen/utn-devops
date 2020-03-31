@@ -28,8 +28,9 @@ if [ ! -x "$(command -v puppet)" ]; then
 	sudo timedatectl set-timezone America/Argentina/Buenos_Aires
 	sudo apt-get -y install ntp
 	sudo systemctl restart ntp
-	sudo mv -f /tmp/puppet-agent.conf /etc/puppet/puppet.conf
 fi
+
+sudo cp -f /tmp/puppet-agent.conf /etc/puppet/puppet.conf
 
 sudo cp -f /tmp/hosts /etc/hosts
 

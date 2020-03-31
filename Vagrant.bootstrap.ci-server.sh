@@ -43,6 +43,4 @@ sudo ufw allow 8140/tcp
 echo "Reiniciando servicio puppet agent"
 sudo systemctl stop puppet && sudo systemctl start puppet
 
-
-#sudo puppet agent --certname utn-devops.localhost --enable
 sudo puppet resource service puppet ensure=running enable=true

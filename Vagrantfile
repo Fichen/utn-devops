@@ -24,10 +24,12 @@ Vagrant.configure("2") do |config|
     end
 
     #shared folder
-    subconfig.vm.synced_folder "./hostConfigs/puppet", "/vagrant"
+    subconfig.vm.synced_folder "./hostConfigs/puppet/code", "/etc/puppet/code"
 
     #ToDo make it a puppet resource
     subconfig.vm.provision "file", source: "hostConfigs/etc_hosts.txt", destination: "/tmp/hosts"
+    subconfig.vm.provision "file", source: "hostConfigs/puppet/puppet-master.conf", destination: "/tmp/puppet-master.conf"
+
     subconfig.vm.provision :shell, path: "Vagrant.bootstrap.master-puppet.sh"
     #
   end
@@ -52,8 +54,6 @@ Vagrant.configure("2") do |config|
     # Files provisioning
     subconfig.vm.provision "file", source: "hostConfigs/puppet/puppet-agent.develop.conf", destination: "/tmp/puppet-agent.conf"
     subconfig.vm.provision "file", source: "hostConfigs/etc_hosts.txt", destination: "/tmp/hosts"
-
-    subconfig.vm.provision :shell, path: "Vagrant.bootstrap.develop.sh"
     #
   end
 
@@ -83,7 +83,6 @@ Vagrant.configure("2") do |config|
   end
 
   #ci-server
-  #test
   config.vm.define "ci-server" do |subconfig|
     subconfig.vm.box = BOX
 

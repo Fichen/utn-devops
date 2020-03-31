@@ -1,0 +1,10 @@
+---
+:backends:
+  - yaml
+
+:hierarchy:
+  - "osfamily/%{::osfamily}"
+  - common
+
+:yaml:
+  :datadir: /etc/puppet/code/hiera

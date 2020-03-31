@@ -47,12 +47,13 @@ if [ ! -x "$(command -v puppet)" ]; then
 fi
 
 # Muevo el archivo de configuración de Puppet al lugar correspondiente
-sudo cp -f /vagrant/puppet-master.conf $PUPPET_DIR/puppet.conf
+sudo cp -f /tmp/puppet-master.conf $PUPPET_DIR/puppet.conf
 
 sudo cp -f /tmp/hosts /etc/hosts
 
 # muevo los archivos que utiliza Puppet
-sudo cp -pf /vagrant/code/* $CODE_DIR
+#echo "cp -rf /vagrant/code/* $CODE_DIR"
+#sudo cp -rf /vagrant/code/* $CODE_DIR
 
 #Habilito el puerto en el firewall
 sudo ufw allow 8140/tcp
