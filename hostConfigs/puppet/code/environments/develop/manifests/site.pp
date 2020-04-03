@@ -10,11 +10,11 @@ node 'develop.utn-devops.localhost' {
         url => 'http://develop.utn-devops.localhost:8081',
         db_database => 'develop_devops_app',
         db_username => 'root',
-        db_password => 'root'
+        db_password => 'root',
+        workdir => '/var/www/utn-devops-app',
     }
     class {'app_config':
-        app => $app,
-        environment_var_dir => '/var/www/utn-devops-app'
+        app => $app
     }
 
     include docker_install

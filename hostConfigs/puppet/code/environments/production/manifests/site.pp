@@ -6,7 +6,7 @@ node 'ci-server.utn-devops.localhost' {
             #include docker_install
             include jenkins
             #include jenkins::packages_dependencies
-            #include jenkins::ssh_keys
+            include jenkins::ssh_keys
 
              $app = {
                 name => 'ci-server-devops-utn',
@@ -17,12 +17,12 @@ node 'ci-server.utn-devops.localhost' {
                 url => 'http://ci-server.utn-devops.localhost:8081',
                 db_database => 'ci-server_devops_app',
                 db_username => 'root',
-                db_password => 'root'
+                db_password => 'root',
+                workdir => '/var/www/utn-devops-app',
             }
-            #class {'app_config':
-            #    app => $app,
-            #    environment_var_dir => '/var/www/utn-devops-app'
-            #}
+            class {'app_config':
+                app => $app
+            }
         }
         default  : { notify {"$::operatingsystem no esta soportado":} }
     }

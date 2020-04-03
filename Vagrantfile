@@ -46,6 +46,7 @@ Vagrant.configure("2") do |config|
 
     # VM settings
     subconfig.vm.hostname = "develop"
+    subconfig.ssh.insert_key = false
     subconfig.vm.provider "virtualbox" do |v|
     v.name = "develop.utn-devops.localhost"
     v.memory = "1024"
@@ -69,6 +70,7 @@ Vagrant.configure("2") do |config|
 
     #VM settings
     subconfig.vm.hostname = "test"
+    subconfig.ssh.insert_key = false
     subconfig.vm.provider "virtualbox" do |v|
     v.name = "test.utn-devops.localhost"
     v.memory = "1024"
@@ -95,6 +97,7 @@ Vagrant.configure("2") do |config|
 
     #VM Settings
     subconfig.vm.hostname = "ci-server"
+    subconfig.ssh.insert_key = false
     subconfig.vm.provider "virtualbox" do |v|
     v.name = "ci-server.utn-devops.localhost"
     v.memory = "1024"

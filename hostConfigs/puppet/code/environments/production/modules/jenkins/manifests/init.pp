@@ -1,5 +1,7 @@
 class jenkins {
 
+    $user_home = '/var/lib/jenkins'
+
     file { '/etc/apt/sources.list.d/jenkins.list':
         content => "deb https://pkg.jenkins.io/debian-stable binary/\n",
         ensure => present,
@@ -29,7 +31,7 @@ class jenkins {
 
     user { 'jenkins':
         ensure  => present,
-        home => '/var/lib/jenkins',
+        home => $user_home,
         shell =>'/bin/bash',
         groups => ['jenkins', 'sudo'],
         membership => minimum,

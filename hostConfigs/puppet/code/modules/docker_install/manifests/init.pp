@@ -6,7 +6,7 @@ class docker_install {
 
   file { 'docker-repository':
     path => '/etc/apt/sources.list.d/docker.list',
-    content => 'deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable/\n',
+    content => 'deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable',
     ensure => present,
     mode    => '0644',
     owner   => root,

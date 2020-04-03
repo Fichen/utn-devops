@@ -2,37 +2,37 @@ pipeline {
     agent any
 
     environment {
-        APP_DIR = 'utn-devops-app/myapp'
-        DEFAULT_BRANCH = 'unidad-2'
+        APP_DIR = 'myapp'
+        DEFAULT_BRANCH = 'unidad-2-rc'
+        WORKSPACE = sh(returnStdout: true, script: 'pwd').trim()
+        COMMIT_ID = ''
+        LS = sh(returnStdout: true, script: 'ls -l')
     }
 
     stages {
-        stage('Prepare') {
+        stage('Checkout') {
             steps {
-                sh "git clone https://github.com/Fichen/utn-devops-app.git || true"
-                sh "cd ${APP_DIR} && git checkout ${DEFAULT_BRANCH}"
-                sh "cd ${APP_DIR} && sudo /usr/local/bin/composer install"
-                sh "chmod 777 ${APP_DIR}/bootstrap/cache/"
+                git branch: DEFAULT_BRANCH,
+                url: 'https://github.com/Fichen/utn-devops-app.git'
+                script {
+                    COMMIT_ID = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                }
+            }
+        }
+        stage('Unit Tests') {
+            steps {
+                sh "${APP_DIR}/vendor/bin/phpunit -c ${APP_DIR}/phpunit.xml"
             }
         }
         stage('Build') {
             steps {
                 sh "find . -path ./${APP_DIR}/vendor -prune -o -name \\*.php -exec php -l \"{}\" \\;"
-                retry(2) {
-                    sh "cd ${APP_DIR} && sudo php -dmemory_limit=750M /usr/local/bin/composer update --no-scripts --prefer-dist"
-                }
+                sh "/var/www/utn-devops-app/build_app.sh '${WORKSPACE}' 'unidad-2-rc' 'ci-server'"
             }
         }
-        stage('Test') {
+        stage('Deploy to develop') {
             steps {
-                sh "${APP_DIR}/vendor/bin/phpunit -c ${APP_DIR}/phpunit.xml"
-            }
-        }
-        stage('Deploy') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'deploy-app', usernameVariable: 'FUSER', passwordVariable: 'FPWD')]) {
-                    echo 'git ftp push --user $FUSER --passwd $FPWD -f --remote-root / --syncroot ./ --disable-epsv ftp://domain.com -v'
-                }
+                sh "ssh service-app-user-01@develop "/var/www/utn-devops-app/build_app.sh '/var/www/utn-devops-app' 'unidad-2-rc' 'ci-server'""
             }
         }
     }

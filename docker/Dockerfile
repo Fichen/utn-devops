@@ -1,24 +1,19 @@
-﻿# Nombre base de la imagen Docker que vamos a utilizar
-# En este caso la imagen es la que está en el repositorio de Hub de Docker y 
-# es la imagen oficial de PHP. El resto de la configuración la tendremos en el 
-# archivo docker-compose.yml
-FROM php:7.0-apache
+﻿FROM php:7.0-apache
 
-# Instalo paquetes complementarios
 RUN apt-get update && apt-get install -y libmcrypt-dev \
-    mysql-client libmagickwand-dev --no-install-recommends \
-	git \
+    mysql-client libmagickwand-dev curl git --no-install-recommends \
     && pecl install imagick \
     && docker-php-ext-enable imagick \
-    && docker-php-ext-install mcrypt pdo_mysql zip 
+    && docker-php-ext-install mcrypt pdo_mysql zip
+    && apt-get autoclean && apt-get clean
+#
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-VOLUME ["/var/www/utn-devops-app/myapp","/var/www/html"]
+WORKDIR /var/www/html/myapp
 
-COPY ./configs/php/php.ini /usr/local/etc/php/php.ini
-COPY ./configs/httpd/devops.site.conf /etc/apache2/sites-available/000-default.conf
-COPY ./configs/app/config_app.sh /tmp/config_app.sh
-
-#CMD ["sh","/tmp/config_app.sh"]
+COPY ./docker-configs/php/php.ini $PHP_INI_DIR/custom.ini
+COPY ./docker-configs/httpd/devops.site.conf /etc/apache2/sites-available/000-default.conf
+COPY . /var/www/html/myapp
 
 EXPOSE 8081
 

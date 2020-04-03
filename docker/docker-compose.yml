@@ -1,17 +1,25 @@
-version: '2'
+version: "3.5"
 services:
   php:
     container_name: apache2_php
     build: .
-    volumes:
-      - "/var/www/utn-devops-app:/var/www/html"
     ports:
       - "8081:80"
     depends_on:
       - db_server
+    #domainname:
+    #hostname:
+    env_file:
+      - /var/www/utn-devops-app/myapp/.env
+    networks:
+      mynet:
+    volumes:
+      - ./vendor:/var/www/html/myapp/vendor
   db_server:
     image: mysql:5.7
     container_name: mysql
+    env_file:
+      - /var/www/utn-devops-app/myapp/.env
     environment:
       - MYSQL_DATABASE=${DB_DATABASE}
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
@@ -19,4 +27,8 @@ services:
       - "4400:3306"
     volumes:
       - /var/db/mysql:/var/lib/mysql
-      - "./configs/mysql/script.sql:/tmp/script.sql"
+      #- "./configs/mysql/script.sql:/tmp/script.sql"
+    networks:
+      mynet:
+networks:
+  mynet:

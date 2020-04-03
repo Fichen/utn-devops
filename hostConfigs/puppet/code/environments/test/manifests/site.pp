@@ -11,10 +11,10 @@ node 'test.utn-devops.localhost' {
         url => 'http://test.utn-devops.localhost:8081',
         db_database => 'test_devops_app',
         db_username => 'root',
-        db_password => 'rootabcd'
+        db_password => 'rootabcd',
+        workdir => '/var/www/utn-devops-app',
     }
     class {'app_config':
-        app => $app,
-        environment_var_dir => '/var/www/utn-devops-app'
+        app => $app
     }
 }
