@@ -3,7 +3,6 @@ node default {}
 node 'ci-server.utn-devops.localhost' {
     case $::operatingsystem {
         'Debian', 'Ubuntu' : {
-            #include docker_install
             include jenkins
             #include jenkins::packages_dependencies
             include jenkins::ssh_keys
@@ -19,10 +18,13 @@ node 'ci-server.utn-devops.localhost' {
                 db_username => 'root',
                 db_password => 'root',
                 workdir => '/var/www/utn-devops-app',
+                domain => 'ci-server.utn-develop.localhost',
             }
             class {'app_config':
                 app => $app
             }
+
+            #include docker_install
         }
         default  : { notify {"$::operatingsystem no esta soportado":} }
     }

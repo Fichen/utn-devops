@@ -20,9 +20,12 @@ if [ "$ENVIRONMENT" = "ci-server" ]; then
     cd "$APP_WORKDIR/myapp"
     sudo docker-compose down
     composer install --no-scripts --prefer-dist
-    chmod 777 myapp/storage/app myapp/storage/framework myapp/storage/logs bootstrap/cache
+    chmod 777 storage/app storage/framework storage/logs bootstrap/cache
     sudo docker-compose build --pull
     sudo docker-compose up -d
+    sudo docker exec -ti apache2_php composer install --no-scripts --prefer-dist
+    sudo docker exec -ti apache2_php chmod 777 storage/app storage/framework storage/logs bootstrap/cache
+
     exit 0
 fi
 

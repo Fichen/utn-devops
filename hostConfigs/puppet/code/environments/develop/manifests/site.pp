@@ -12,6 +12,7 @@ node 'develop.utn-devops.localhost' {
         db_username => 'root',
         db_password => 'root',
         workdir => '/var/www/utn-devops-app',
+        domain => 'develop.utn-develop.localhost',
     }
     class {'app_config':
         app => $app

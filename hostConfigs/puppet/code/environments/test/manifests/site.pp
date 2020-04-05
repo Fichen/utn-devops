@@ -13,6 +13,7 @@ node 'test.utn-devops.localhost' {
         db_username => 'root',
         db_password => 'rootabcd',
         workdir => '/var/www/utn-devops-app',
+        domain => 'test.utn-develop.localhost',
     }
     class {'app_config':
         app => $app

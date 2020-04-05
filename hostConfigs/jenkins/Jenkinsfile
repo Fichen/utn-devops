@@ -1,39 +1,41 @@
-pipeline {
-    agent any
+    pipeline {
+        agent any
 
-    environment {
-        APP_DIR = 'myapp'
-        DEFAULT_BRANCH = 'unidad-2-rc'
-        WORKSPACE = sh(returnStdout: true, script: 'pwd').trim()
-        COMMIT_ID = ''
-        LS = sh(returnStdout: true, script: 'ls -l')
-    }
+        environment {
+            APP_DIR = 'myapp'
+            DEFAULT_BRANCH = 'unidad-2-rc'
+            WORKSPACE = sh(returnStdout: true, script: 'pwd').trim()
+            COMMIT_ID = ''
+            LS = sh(returnStdout: true, script: 'ls -l')
+        }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: DEFAULT_BRANCH,
-                url: 'https://github.com/Fichen/utn-devops-app.git'
-                script {
-                    COMMIT_ID = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+        stages {
+            stage('Checkout') {
+                steps {
+                    git branch: DEFAULT_BRANCH,
+                    url: 'https://github.com/Fichen/utn-devops-app.git'
+                    script {
+                        COMMIT_ID = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                    }
+                }
+            }
+            //stage('Unit Tests') {
+            //    steps {
+            //        sh "${APP_DIR}/vendor/bin/phpunit -c ${APP_DIR}/phpunit.xml"
+            //    }
+            //}
+            stage('Build') {
+                steps {
+                    sh "find . -path ./${APP_DIR}/vendor -prune -o -name \\*.php -exec php -l \"{}\" \\;"
+                    sh "/var/www/utn-devops-app/build_app.sh '${WORKSPACE}' 'unidad-2-rc' 'ci-server'"
+                }
+            }
+            stage('Deploy to develop') {
+                steps {
+                    sh '''
+                    ssh service-app-user-01@develop "/var/www/utn-devops-app/build_app.sh '/var/www/utn-devops-app' 'unidad-2-rc' 'ci-server'"
+                    '''
                 }
             }
         }
-        stage('Unit Tests') {
-            steps {
-                sh "${APP_DIR}/vendor/bin/phpunit -c ${APP_DIR}/phpunit.xml"
-            }
-        }
-        stage('Build') {
-            steps {
-                sh "find . -path ./${APP_DIR}/vendor -prune -o -name \\*.php -exec php -l \"{}\" \\;"
-                sh "/var/www/utn-devops-app/build_app.sh '${WORKSPACE}' 'unidad-2-rc' 'ci-server'"
-            }
-        }
-        stage('Deploy to develop') {
-            steps {
-                sh "ssh service-app-user-01@develop "/var/www/utn-devops-app/build_app.sh '/var/www/utn-devops-app' 'unidad-2-rc' 'ci-server'""
-            }
-        }
     }
-}
