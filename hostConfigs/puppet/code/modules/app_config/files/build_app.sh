@@ -3,7 +3,29 @@
 APP_WORKDIR=$1
 COMMIT=$2
 ENVIRONMENT=$3
+CI_SERVER_WORKSPACE=$4
 DEFAULT_BRANCH="unidad-2-rc"
+
+
+function command_as_current_user_dir() {
+    local ARG=$1
+    cd $APP_WORKDIR
+    CURRENT_USER=$(ls -ld . | awk '{print $3}')
+    OUTPUT=$(sudo su $CURRENT_USER -c " ${ARG} ")
+    echo "sudo su $CURRENT_USER -c ${ARG} "
+}
+
+function regenerate_docker_images() {
+    cd "$APP_WORKDIR/myapp"
+    echo "Stopping docker-compose"
+    sudo docker-compose down
+    echo "Building context"
+    sudo docker-compose build --pull
+    echo "Starting up and configuring app"
+    sudo docker-compose up -d
+    sudo docker exec -ti apache2_php composer install --no-scripts --prefer-dist
+    sudo docker exec -ti apache2_php chmod 777 storage/app storage/framework storage/logs bootstrap/cache
+}
 
 if [ "$APP_WORKDIR" = "" ]; then
     echo "APP_WORKDIR required; ie /var/www/utn-devops-app"
@@ -11,44 +33,27 @@ if [ "$APP_WORKDIR" = "" ]; then
 fi
 
 if [ "$COMMIT" = "" ]; then
-    echo "Not commit ref assigned, switching to unidad-2-rc"
+    echo "No commit ref assigned, switching to unidad-2-rc"
     COMMIT=$DEFAULT_BRANCH
 fi
 
 if [ "$ENVIRONMENT" = "ci-server" ]; then
-    sudo cp "${APP_WORKDIR}/.env" .
-    cd "$APP_WORKDIR/myapp"
-    sudo docker-compose down
-    composer install --no-scripts --prefer-dist
-    chmod 777 storage/app storage/framework storage/logs bootstrap/cache
-    sudo docker-compose build --pull
-    sudo docker-compose up -d
-    sudo docker exec -ti apache2_php composer install --no-scripts --prefer-dist
-    sudo docker exec -ti apache2_php chmod 777 storage/app storage/framework storage/logs bootstrap/cache
-
+    echo "Copying env file in ${ENVIRONMENT}"
+    sudo cp -f ${APP_WORKDIR}/.env ${CI_SERVER_WORKSPACE}/myapp/.env
+    regenerate_docker_images
     exit 0
 fi
 
-echo "Applying puppet manifests"
-sudo puppet agent -t
-
-cd $APP_WORKDIR
-CURRENT_USER=$(ls -ld . | awk '{print $3}')
-APP_USER_COMMAND="sudo su $CURRENT_USER -c "
-
 if [ ! -d "$APP_WORKDIR/.git" ]; then
-    $APP_USER_COMMAND 'git init'
-    $APP_USER_COMMAND 'git remote add origin https://github.com/Fichen/utn-devops-app.git'
-    $APP_USER_COMMAND 'git fetch --all'
+    command_as_current_user_dir 'git init'
+    command_as_current_user_dir 'git remote add origin https://github.com/Fichen/utn-devops-app.git'
+    command_as_current_user_dir 'git fetch --all'
 fi
 
-$APP_USER_COMMAND 'git pull'
-$APP_USER_COMMAND "git checkout $COMMIT"
+command_as_current_user_dir 'git pull'
+command_as_current_user_dir "git checkout $COMMIT"
 
-$APP_USER_COMMAND "cp -p $APP_WORKDIR/.env $APP_WORKDIR/myapp/.env"
-cd "$APP_WORKDIR/myapp"
-sudo docker-compose down
-sudo docker-compose build --pull
-sudo docker-compose up -d
-sudo docker exec -ti apache2_php composer install --no-scripts --prefer-dist
-sudo docker exec -ti apache2_php chmod 777 storage/app storage/framework storage/logs bootstrap/cache
+echo "Copying env file"
+command_as_current_user_dir "cp -p $APP_WORKDIR/.env $APP_WORKDIR/myapp/.env"
+regenerate_docker_images
+
