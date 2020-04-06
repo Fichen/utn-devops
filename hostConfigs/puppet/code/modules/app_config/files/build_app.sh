@@ -20,9 +20,10 @@ function regenerate_docker_images() {
     echo "Stopping docker-compose"
     sudo docker-compose down
     echo "Building context"
-    sudo docker-compose build --pull
+    sudo docker-compose build
     echo "Starting up and configuring app"
     sudo docker-compose up -d
+    sudo docker exec apache2_php composer update --no-scripts --prefer-dist
     sudo docker exec apache2_php composer install --no-scripts --prefer-dist
     sudo docker exec apache2_php chmod 0777 -R storage bootstrap/cache
     sudo docker exec apache2_php php artisan migrate:refresh
