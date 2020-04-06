@@ -20,15 +20,15 @@ pipeline {
                 }
             }
         }
-        //stage('Unit Tests') {
-        //    steps {
-        //        sh "${APP_DIR}/vendor/bin/phpunit -c ${APP_DIR}/phpunit.xml"
-        //    }
-        //}
         stage('Build') {
             steps {
                 sh "find . -path ./${APP_DIR}/vendor -prune -o -name \\*.php -exec php -l \"{}\" \\;"
                 sh "/var/www/utn-devops-app/build_app.sh '/var/www/utn-devops-app' 'unidad-2-rc' 'ci-server' ${WORKSPACE}"
+            }
+        }
+        stage('Unit Tests') {
+            steps {
+                sh "${APP_DIR}/vendor/bin/phpunit -c ${APP_DIR}/phpunit.xml"
             }
         }
         stage('Deploy to develop') {

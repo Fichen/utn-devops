@@ -36,7 +36,7 @@ class app_config($app) {
         require => File[$environment_var_dir],
     }
 
-    file {'app-script-deploy':
+    file {'app-build-script':
         path => "${environment_var_dir}/build_app.sh",
         ensure => present,
         source => 'puppet:///modules/app_config/build_app.sh',

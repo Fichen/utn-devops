@@ -11,8 +11,8 @@ function command_as_current_user_dir() {
     local ARG=$1
     cd $APP_WORKDIR
     CURRENT_USER=$(ls -ld . | awk '{print $3}')
-    OUTPUT=$(sudo su $CURRENT_USER -c " ${ARG} ")
-    echo "sudo su $CURRENT_USER -c ${ARG} "
+    sudo su $CURRENT_USER -c " ${ARG} "
+    #echo "sudo su $CURRENT_USER -c ${ARG} "
 }
 
 function regenerate_docker_images() {
@@ -23,8 +23,11 @@ function regenerate_docker_images() {
     sudo docker-compose build --pull
     echo "Starting up and configuring app"
     sudo docker-compose up -d
-    sudo docker exec -ti apache2_php composer install --no-scripts --prefer-dist
-    sudo docker exec -ti apache2_php chmod 777 storage/app storage/framework storage/logs bootstrap/cache
+    sudo docker exec apache2_php composer install --no-scripts --prefer-dist
+    sudo docker exec apache2_php chmod 0777 -R storage bootstrap/cache
+    sudo docker exec apache2_php php artisan migrate:refresh
+    sudo docker exec apache2_php php artisan config:clear
+
 }
 
 if [ "$APP_WORKDIR" = "" ]; then
@@ -57,3 +60,4 @@ echo "Copying env file"
 command_as_current_user_dir "cp -p $APP_WORKDIR/.env $APP_WORKDIR/myapp/.env"
 regenerate_docker_images
 
+exit 0
