@@ -1,0 +1,10 @@
+{
+    "auths": {
+            "docker-registry.int:5000": {
+                    "auth": "YWRtaW46YWRtaW4="
+            }
+    },
+    "HttpHeaders": {
+            "User-Agent": "Docker-Client/19.03.6 (linux)"
+    }
+}
