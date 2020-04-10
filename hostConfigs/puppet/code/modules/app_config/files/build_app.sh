@@ -17,18 +17,17 @@ function command_as_current_user_dir() {
 
 function regenerate_docker_images() {
     cd "$APP_WORKDIR/myapp"
+    echo "cd $APP_WORKDIR/myapp"
     echo "Stopping docker-compose"
     sudo docker-compose down
     echo "Building context"
     sudo docker-compose build
     echo "Starting up and configuring app"
     sudo docker-compose up -d
-    sudo docker exec apache2_php composer update --no-scripts --prefer-dist
     sudo docker exec apache2_php composer install --no-scripts --prefer-dist
     sudo docker exec apache2_php chmod 0777 -R storage bootstrap/cache
     sudo docker exec apache2_php php artisan migrate:refresh
     sudo docker exec apache2_php php artisan config:clear
-
 }
 
 if [ "$APP_WORKDIR" = "" ]; then

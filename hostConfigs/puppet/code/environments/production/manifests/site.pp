@@ -25,6 +25,7 @@ node 'ci-server.utn-devops.localhost' {
             }
 
             #include docker_install
+            class { 'docker_install::registry': }
         }
         default  : { notify {"$::operatingsystem no esta soportado":} }
     }

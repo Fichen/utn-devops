@@ -2,7 +2,7 @@
 10.0.0.10       puppet-master.utn-devops.localhost  puppet-master
 10.0.0.11       develop.utn-devops.localhost    develop
 10.0.0.12       test.utn-devops.localhost   test
-10.0.0.13       ci-server.utn-devops.localhost  ci-server
+10.0.0.13       ci-server.utn-devops.localhost  ci-server docker-registry.int
 
 # The following lines are desirable for IPv6 capable hosts
 ::1     ip6-localhost   ip6-loopback

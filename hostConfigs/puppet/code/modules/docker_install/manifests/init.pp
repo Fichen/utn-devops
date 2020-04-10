@@ -18,11 +18,16 @@ class docker_install {
     require => File['docker-repository']
   }
 
-  $packages = ['apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common','docker', 'docker-compose']
+  $packages = ['apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common','docker']
 
   package { $packages:
     require => Exec['repository-key','apt-update'],
     ensure => installed
+  }
+
+  #conflict with docker login credentials
+  package { 'golang-docker-credential-helpers':
+    ensure => absent,
   }
 
   service { 'docker':

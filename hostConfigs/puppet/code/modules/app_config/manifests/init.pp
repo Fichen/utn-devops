@@ -20,6 +20,13 @@ class app_config($app) {
         ensure => directory,
     }
 
+    file { "${environment_var_dir}/.docker":
+        owner => 'service-app-user-01',
+        group => 'service-app-user-01',
+        mode => '0700',
+        ensure => directory,
+    }
+
     file {'ssh-keys-service-user':
         path => "${environment_var_dir}/.ssh/authorized_keys",
         ensure => present,

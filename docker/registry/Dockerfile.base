@@ -1,0 +1,20 @@
+FROM php:7.1-apache
+
+RUN apt-get update && apt-get install -y libmcrypt-dev \
+    mariadb-client libmagickwand-dev curl libcurl4-openssl-dev --no-install-recommends \
+    && pecl install imagick \
+    && docker-php-ext-enable imagick \
+    && docker-php-ext-install mcrypt pdo_mysql zip curl \
+    && apt-get autoclean && apt-get clean
+#
+WORKDIR /var/www/html/myapp
+
+RUN curl --silent --show-error https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && composer global require hirak/prestissimo
+
+COPY ./docker-configs/php/php.ini $PHP_INI_DIR/custom.ini
+COPY ./docker-configs/httpd/app.site.conf /etc/apache2/sites-available/000-default.conf
+
+EXPOSE 8081
+
+CMD /usr/sbin/apache2ctl -D FOREGROUND

@@ -5,16 +5,23 @@ pipeline {
         APP_DIR = 'myapp'
         DEFAULT_BRANCH = 'unidad-2-rc'
         WORKSPACE = sh(returnStdout: true, script: 'pwd').trim()
-        COMMIT_ID = ''
+        COMMIT_ID = "$DEFAULT_BRANCH"
+        REPO_URL = 'https://github.com/Fichen/utn-devops-app.git'
     }
 
     stages {
         stage('Checkout') {
             steps {
+                sh "WORKSPACE=${WORKSPACE}"
                 git branch: DEFAULT_BRANCH,
-                url: 'https://github.com/Fichen/utn-devops-app.git'
+                url: "$REPO_URL"
                 script {
                     COMMIT_ID = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                    sh '''
+                    git fetch --all
+                    git pull ${REPO_URL} ${DEFAULT_BRANCH}
+                    git checkout ${COMMIT_ID}
+                    '''
                     echo "Applying puppet manifests"
                     sh 'sudo puppet agent -t || true'
                 }
@@ -23,6 +30,16 @@ pipeline {
         stage('Build') {
             steps {
                 sh "find . -path ./${APP_DIR}/vendor -prune -o -name \\*.php -exec php -l \"{}\" \\;"
+                sh '''
+                echo "login to private registry"
+                sudo docker login https://docker-registry.int:5000 --username admin --password admin
+                echo "Commiting image"
+                sudo docker commit $(sudo docker ps -lq) myapp_php
+                echo "Tagging image"
+                sudo docker tag myapp_php docker-registry.int:5000/myapp_php:${COMMIT_ID}
+                echo "Pushing image to private registry"
+                sudo docker push docker-registry.int:5000/myapp_php
+                '''
                 sh "/var/www/utn-devops-app/build_app.sh '/var/www/utn-devops-app' 'unidad-2-rc' 'ci-server' ${WORKSPACE}"
             }
         }

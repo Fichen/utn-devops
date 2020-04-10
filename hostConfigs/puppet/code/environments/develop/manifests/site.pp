@@ -13,10 +13,15 @@ node 'develop.utn-devops.localhost' {
         db_password => 'root',
         workdir => '/var/www/utn-devops-app',
         domain => 'develop.utn-develop.localhost',
+        user => 'service-app-user-01',
+        group => 'service-app-user-01',
     }
     class {'app_config':
         app => $app
     }
 
     include docker_install
+    class { 'docker_install::certificates':
+        variables => $app
+    }
 }
