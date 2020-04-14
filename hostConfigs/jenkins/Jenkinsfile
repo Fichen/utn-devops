@@ -23,29 +23,37 @@ pipeline {
                     git checkout ${COMMIT_ID}
                     '''
                     echo "Applying puppet manifests"
-                    sh 'sudo puppet agent -t || true'
+                    //sh 'sudo puppet agent -t || true'
                 }
             }
         }
         stage('Build') {
             steps {
-                sh "find . -path ./${APP_DIR}/vendor -prune -o -name \\*.php -exec php -l \"{}\" \\;"
-                sh '''
+                sh "sudo cp -f /var/www/utn-devops-app/.env ."
+                sh "sudo docker-compose up -d"
+                echo "Checking syntax error"
+                sh '''sudo docker exec apache2_php find . -path ./vendor -prune -o -name \\*.php -exec php -l \"{}\" \\;'''
+                sh "sudo docker-compose down"
+                sh "sudo docker-compose build"
+                sh "sudo docker-compose up -d"
+                sh "sudo docker exec apache2_php composer install --no-scripts --prefer-dist"
+                sh "sudo docker exec apache2_php chmod 0777 -R storage bootstrap/cache"
+                sh "sudo docker exec apache2_php php artisan migrate:refresh"
+                sh "sudo docker exec apache2_php php artisan config:clear"
                 echo "login to private registry"
-                sudo docker login https://docker-registry.int:5000 --username admin --password admin
+                //sh "sudo docker login https://docker-registry.int:5000 --username admin --password admin"
                 echo "Commiting image"
-                sudo docker commit $(sudo docker ps -lq) myapp_php
+                //sudo docker commit $(sudo docker ps -lq) myapp_php
                 echo "Tagging image"
-                sudo docker tag myapp_php docker-registry.int:5000/myapp_php:${COMMIT_ID}
+                //sudo docker tag myapp_php docker-registry.int:5000/myapp_php
                 echo "Pushing image to private registry"
-                sudo docker push docker-registry.int:5000/myapp_php
-                '''
-                sh "/var/www/utn-devops-app/build_app.sh '/var/www/utn-devops-app' 'unidad-2-rc' 'ci-server' ${WORKSPACE}"
+                //sudo docker push docker-registry.int:5000/myapp_php
+                //sh "/var/www/utn-devops-app/build_app.sh '/var/www/utn-devops-app' 'unidad-2-rc' 'ci-server' ${WORKSPACE}"
             }
         }
         stage('Unit Tests') {
             steps {
-                sh "${APP_DIR}/vendor/bin/phpunit -c ${APP_DIR}/phpunit.xml"
+                sh "sudo docker exec apache2_php ./vendor/bin/phpunit -c phpunit.xml"
             }
         }
         stage('Deploy to develop') {
@@ -54,8 +62,8 @@ pipeline {
                     echo "Applying puppet manifests"
                     ssh service-app-user-01@develop 'sudo puppet agent -t ||true'
                     echo "Executing deployment script"
-                    ssh service-app-user-01@develop "/var/www/utn-devops-app/build_app.sh '/var/www/utn-devops-app' 'unidad-2-rc'"
                 '''
+                //ssh service-app-user-01@develop "/var/www/utn-devops-app/build_app.sh '/var/www/utn-devops-app' 'unidad-2-rc'"
             }
         }
     }

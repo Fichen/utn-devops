@@ -46,7 +46,6 @@ Vagrant.configure("2") do |config|
 
     # VM settings
     subconfig.vm.hostname = "develop"
-    subconfig.ssh.insert_key = false
     subconfig.vm.provider "virtualbox" do |v|
     v.name = "develop.utn-devops.localhost"
     v.memory = "1024"
@@ -55,6 +54,8 @@ Vagrant.configure("2") do |config|
     # Files provisioning
     subconfig.vm.provision "file", source: "hostConfigs/puppet/puppet-agent.develop.conf", destination: "/tmp/puppet-agent.conf"
     subconfig.vm.provision "file", source: "hostConfigs/etc_hosts.txt", destination: "/tmp/hosts"
+
+    subconfig.vm.provision :shell, path: "Vagrant.bootstrap.develop.sh"
     #
   end
 
@@ -70,7 +71,6 @@ Vagrant.configure("2") do |config|
 
     #VM settings
     subconfig.vm.hostname = "test"
-    subconfig.ssh.insert_key = false
     subconfig.vm.provider "virtualbox" do |v|
     v.name = "test.utn-devops.localhost"
     v.memory = "1024"
@@ -80,7 +80,7 @@ Vagrant.configure("2") do |config|
     subconfig.vm.provision "file", source: "hostConfigs/puppet/puppet-agent.test.conf", destination: "/tmp/puppet-agent.conf"
     subconfig.vm.provision "file", source: "hostConfigs/etc_hosts.txt", destination: "/tmp/hosts"
 
-    subconfig.vm.provision :shell, path: "Vagrant.bootstrap.develop.sh"
+    subconfig.vm.provision :shell, path: "Vagrant.bootstrap.test.sh"
     #
   end
 
@@ -97,7 +97,6 @@ Vagrant.configure("2") do |config|
 
     #VM Settings
     subconfig.vm.hostname = "ci-server"
-    subconfig.ssh.insert_key = false
     subconfig.vm.provider "virtualbox" do |v|
     v.name = "ci-server.utn-devops.localhost"
     v.memory = "1024"

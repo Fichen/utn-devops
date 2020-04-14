@@ -1,20 +1,44 @@
-FROM php:7.1-apache
+FROM php:7.2-apache
 
-RUN apt-get update && apt-get install -y libmcrypt-dev \
-    mariadb-client libmagickwand-dev curl libcurl4-openssl-dev --no-install-recommends \
-    && pecl install imagick \
-    && docker-php-ext-enable imagick \
-    && docker-php-ext-install mcrypt pdo_mysql zip curl \
+LABEL maintainer="David Fichtenbaum"
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    zip \
+    curl \
+    sudo \
+    unzip \
+    libicu-dev \
+    libbz2-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libmcrypt-dev \
+    libreadline-dev \
+    libfreetype6-dev \
+    g++ \
+    libcurl4-openssl-dev \
+    && docker-php-ext-install \
+    bz2 \
+    intl \
+    iconv \
+    bcmath \
+    opcache \
+    calendar \
+    mbstring \
+    pdo_mysql \
+    zip \
+    curl \
     && apt-get autoclean && apt-get clean
 #
-WORKDIR /var/www/html/myapp
 
-RUN curl --silent --show-error https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && composer global require hirak/prestissimo
+RUN curl https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+RUN composer global require hirak/prestissimo
 
 COPY ./docker-configs/php/php.ini $PHP_INI_DIR/custom.ini
 COPY ./docker-configs/httpd/app.site.conf /etc/apache2/sites-available/000-default.conf
 
-EXPOSE 8081
 
-CMD /usr/sbin/apache2ctl -D FOREGROUND
+WORKDIR /var/www/html
+
+EXPOSE 8081

@@ -31,6 +31,7 @@ class docker_install::registry {
     }
 
     exec { 'docker-restart':
-        command => '/bin/systemctl restart docker'
+        command => '/bin/systemctl restart docker',
+        onlyif => '/usr/bin/test -f /usr/bin/docker'
     }
 }
