@@ -1,9 +1,7 @@
 class docker_install {
+  $composeVersion = "1.25.4"
 
-  exec { 'apt-update':
-    command => '/usr/bin/apt-get update',
-    unless => '/usr/bin/test -x $(command -v docker)',
-  }
+  $packages = ['apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'docker-ce']
 
   file { 'docker-repository':
     path => '/etc/apt/sources.list.d/docker.list',
@@ -14,28 +12,29 @@ class docker_install {
     group   => root
   }
 
-  $packages = ['apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'docker-ce']
-
   exec { 'repository-key':
-    command => '/usr/bin/curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -',
+    command => '/usr/bin/curl -fsSL https://download.docker.com/linux/ubuntu/gpg | /usr/bin/sudo apt-key add -',
     require => File['docker-repository'],
     unless => '/usr/bin/test -x $(command -v docker)',
   }
 
-  package { $packages:
-    require => Exec['repository-key','apt-update'],
-    ensure => installed,
+  exec { 'apt-update':
+    command => '/usr/bin/apt-get update',
+    require => File['docker-repository'],
   }
 
-$composeVersion ="1.25.4"
+  package { $packages:
+    ensure => installed,
+    require => Exec['apt-update'],
+  }
+
   exec { 'install-docker-compose':
     command => "/usr/bin/sudo curl -L \"https://github.com/docker/compose/releases/download/${composeVersion}/docker-compose-$(uname -s)-$(uname -m)\" -o /usr/local/bin/docker-compose",
-    onlyif => '/usr/bin/test ! -x $(command -v docker-compose)',
+    onlyif => '/usr/bin/test ! -x /usr/local/bin/docker-compose',
   } ->
   exec { 'permission-docker-compose':
     command => 'sudo chmod +x /usr/local/bin/docker-compose',
     path => ['/usr/bin'],
-    onlyif => 'test -f /usr/local/bin/docker-compose',
   }
 
   #conflict with docker login credentials
@@ -45,7 +44,7 @@ $composeVersion ="1.25.4"
 
   service { 'docker':
     ensure => running,
-    enable  => true,
+    enable => true,
   }
 
 }
