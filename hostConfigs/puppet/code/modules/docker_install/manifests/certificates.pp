@@ -15,12 +15,13 @@ class docker_install::certificates($variables) {
         source => 'puppet:///modules/docker_install/certs/domain.crt',
         ensure => present,
         audit => content,
-        notify => Exec['docker-update-ca-certificates'],
     }
 
     exec { 'docker-update-ca-certificates':
         command => '/usr/sbin/update-ca-certificates',
+        require => File['docker-registry-host-certificate-crt'],
         notify => Service['docker'],
+        onlyif => '/usr/bin/test -x $(command -v docker)',
     }
 
 }
