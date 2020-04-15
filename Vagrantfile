@@ -102,6 +102,9 @@ Vagrant.configure("2") do |config|
     v.memory = "1024"
     end
 
+    #shared folder
+    subconfig.vm.synced_folder "./docker/registry", "/home/vagrant/docker-registry"
+
     #File provisioning
     subconfig.vm.provision "file", source: "hostConfigs/puppet/puppet-agent.production.conf", destination: "/tmp/puppet-agent.conf"
     subconfig.vm.provision "file", source: "hostConfigs/etc_hosts.txt", destination: "/tmp/hosts"
