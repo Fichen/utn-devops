@@ -9,8 +9,8 @@ function command_as_current_user_dir() {
     local ARG=$1
     cd $APP_WORKDIR
     CURRENT_USER=$(ls -ld . | awk '{print $3}')
+    echo "Executing: sudo su $CURRENT_USER -c ${ARG} "
     sudo su $CURRENT_USER -c " ${ARG} "
-    #echo "sudo su $CURRENT_USER -c ${ARG} "
 }
 
 function regenerate_docker_images() {
