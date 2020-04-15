@@ -25,7 +25,7 @@ if [ ! -x "$(command -v puppet)" ]; then
 
 	sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
  	sudo apt-get update
-	sudo apt install -y puppetmaster
+	sudo apt install -y puppetmaster ruby-msgpack
 
   # Esto es necesario en entornos reales para posibilitar la sincronizacion
   # entre master y agents
@@ -51,8 +51,7 @@ sudo cp -f /tmp/puppet-master.conf $PUPPET_DIR/puppet.conf
 
 sudo cp -f /tmp/hosts /etc/hosts
 
-# muevo los archivos que utiliza Puppet
-#echo "cp -rf /vagrant/code/* $CODE_DIR"
+# muevo los archivos que utiliza Puppet| compartido desde vagrant
 #sudo cp -rf /vagrant/code/* $CODE_DIR
 
 #Habilito el puerto en el firewall

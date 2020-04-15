@@ -5,8 +5,8 @@ if [ ! -f "/swapdir/swapfile" ]; then
 	sudo mkdir /swapdir
 	cd /swapdir
 	sudo dd if=/dev/zero of=/swapdir/swapfile bs=1024 count=2000000
-	sudo mkswap -f  /swapdir/swapfile
 	sudo chmod 600 /swapdir/swapfile
+	sudo mkswap -f  /swapdir/swapfile
 	sudo swapon swapfile
 	echo "/swapdir/swapfile       none    swap    sw      0       0" | sudo tee -a /etc/fstab /etc/fstab
 	sudo sysctl vm.swappiness=10
@@ -16,17 +16,14 @@ fi
 
 if [ ! -x "$(command -v puppet)" ]; then
 
-	#### Instalacion puppet master
-  	#Directorios
-
+	#### Instalacion puppet
 	sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
  	sudo apt-get update
 
 	#### Instalacion puppet agent
-	sudo apt install -y puppet
+	sudo apt install -y puppet ruby-msgpack
 
-  	# Esto es necesario en entornos reales para posibilitar la sincronizacion
-  	# entre master y agents
+  	# Necesario para la sincronización entre puppet master y agent
 	sudo timedatectl set-timezone America/Argentina/Buenos_Aires
 	sudo apt-get -y install ntp
 	sudo systemctl restart ntp
