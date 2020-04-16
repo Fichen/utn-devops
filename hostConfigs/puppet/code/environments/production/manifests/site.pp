@@ -1,6 +1,11 @@
 node default {}
 
 node 'ci-server.utn-devops.int' {
+    if versioncmp($::puppetversion, '3.6.0') >= 0 {
+        Package {
+            allow_virtual => false,
+        }
+    }
     case $::operatingsystem {
         'Debian', 'Ubuntu' : {
             include jenkins
@@ -28,7 +33,7 @@ node 'ci-server.utn-devops.int' {
             }
 
             include docker_install
-            #class { 'docker_install::registry': }
+            class { 'docker_install::registry': }
         }
         default  : { notify {"$::operatingsystem no esta soportado":} }
     }

@@ -3,6 +3,7 @@
 10.0.0.11       develop.utn-devops.int    develop
 10.0.0.12       test.utn-devops.int   test
 10.0.0.13       ci-server.utn-devops.int  ci-server docker-registry.int
+10.0.0.20       local-dev.utn-devops.int    local-dev
 
 # The following lines are desirable for IPv6 capable hosts
 ::1     ip6-localhost   ip6-loopback

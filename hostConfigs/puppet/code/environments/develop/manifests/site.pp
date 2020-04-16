@@ -1,6 +1,11 @@
 node default {}
 
 node 'develop.utn-devops.int' {
+    if versioncmp($::puppetversion, '3.6.0') >= 0 {
+        Package {
+            allow_virtual => false,
+        }
+    }
     $app = {
         name => 'develop-devops-utn',
         env => 'develop',
@@ -22,7 +27,7 @@ node 'develop.utn-devops.int' {
     }
 
     include docker_install
-    class { 'docker_install::certificates':
-        variables => $app
-    }
+    #class { 'docker_install::certificates':
+    #    variables => $app
+    #}
 }
