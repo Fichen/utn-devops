@@ -1,4 +1,4 @@
-# Práctica integradora
+# Práctica integradora - NOT COMPLETED
 
 Esta práctica tiene como objetivo mostrar la utilización un stack de herramientas para instanciar un pipeline de Integración Continua y Despliegue Continuo (CI/CD)
 
