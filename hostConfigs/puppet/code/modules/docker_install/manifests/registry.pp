@@ -27,11 +27,12 @@ class docker_install::registry {
     exec { 'docker-update-ca-certificates':
         command => '/usr/sbin/update-ca-certificates',
         require => File['/usr/local/share/ca-certificates/domain.crt'],
+        onlyif => '/usr/bin/test ! -n "$(ls -l /etc/ssl/certs/|grep domain.pem)"',
         notify => Exec['docker-restart'],
     }
 
     exec { 'docker-restart':
         command => '/bin/systemctl restart docker',
-        onlyif => '/usr/bin/test -f /usr/bin/docker'
+        unless => '/usr/bin/test -L "/etc/ssl/certs/domain.pem"',
     }
 }

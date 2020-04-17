@@ -21,7 +21,7 @@ class docker_install::certificates($variables) {
         command => '/usr/sbin/update-ca-certificates',
         require => File['docker-registry-host-certificate-crt'],
         notify => Service['docker'],
-        onlyif => '/usr/bin/test -x $(command -v docker)',
+        onlyif => '/usr/bin/test ! -n "$(ls -l /etc/ssl/certs/|grep domain.pem)"',
     }
 
 }

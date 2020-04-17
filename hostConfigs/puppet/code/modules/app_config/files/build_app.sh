@@ -15,12 +15,12 @@ function command_as_current_user_dir() {
 
 function regenerate_docker_images() {
     cd "$APP_WORKDIR"
-    echo "Stopping docker-compose"
-    sudo docker-compose down
-    echo "Building context"
-    sudo docker-compose build
-    echo "Starting up and configuring app"
+    echo "Pulling images"
+    sudo docker-compose pull
+    echo "Restarting up and configuring app"
+    sudo docker-compose stop
     sudo docker-compose up -d
+    echo "Running migration scrips"
     sudo docker exec apache2_php chmod 0777 -R storage bootstrap/cache
     sudo docker exec apache2_php php artisan migrate:refresh
     sudo docker exec apache2_php php artisan config:clear

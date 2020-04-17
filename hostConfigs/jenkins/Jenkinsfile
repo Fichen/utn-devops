@@ -2,53 +2,55 @@ pipeline {
     agent any
 
     environment {
-        APP_DIR = 'myapp'
+        //APP_DIR = 'myapp'
         DEFAULT_BRANCH = 'unidad-2-rc'
         WORKSPACE = sh(returnStdout: true, script: 'pwd').trim()
-        COMMIT_ID = "$DEFAULT_BRANCH"
+        COMMIT_ID = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
         REPO_URL = 'https://github.com/Fichen/utn-devops-app.git'
+        DOCKER_FINAL_IMAGE = 'docker-registry.int:5000/myapp-example'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                sh "WORKSPACE=${WORKSPACE}"
+                echo "WORKSPACE=${WORKSPACE}"
                 git branch: DEFAULT_BRANCH,
                 url: "$REPO_URL"
+                sh "git checkout -f ${COMMIT_ID}"
                 script {
-                    COMMIT_ID = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-                    sh '''
-                    git fetch --all
-                    git pull ${REPO_URL} ${DEFAULT_BRANCH}
-                    git checkout ${COMMIT_ID}
-                    '''
+                    echo "Last commit: ${COMMIT_ID}"
+                    sh "git status"
                     echo "Applying puppet manifests"
-                    //sh 'sudo puppet agent -t || true'
+                    sh 'sudo puppet agent -t || true'
                 }
             }
         }
         stage('Build') {
             steps {
                 sh "sudo cp -f /var/www/utn-devops-app/.env ."
+                sh "sudo docker-compose pull"
+                sh "sudo docker-compose build"
+                sh "sudo docker-compose stop"
                 sh "sudo docker-compose up -d"
                 echo "Checking syntax error"
-                sh '''sudo docker exec apache2_php find . -path ./vendor -prune -o -name \\*.php -exec php -l \"{}\" \\;'''
-                sh "sudo docker-compose down"
-                sh "sudo docker-compose build"
-                sh "sudo docker-compose up -d"
-                sh "sudo docker exec apache2_php composer install --no-scripts --prefer-dist"
+                sh "sudo docker exec apache2_php find . -path ./vendor -prune -o -name \\*.php -exec php -l \"{}\" \\;"
+                retry(2) {
+                    sh "sudo docker exec apache2_php composer install --no-scripts --prefer-dist"
+                }
                 sh "sudo docker exec apache2_php chmod 0777 -R storage bootstrap/cache"
                 sh "sudo docker exec apache2_php php artisan migrate:refresh"
                 sh "sudo docker exec apache2_php php artisan config:clear"
+                sh  '''sudo docker exec apache2_php bash -c "echo ${COMMIT_ID} > /COMMIT_VALIDATION" '''
                 echo "login to private registry"
-                //sh "sudo docker login https://docker-registry.int:5000 --username admin --password admin"
+                sh "sudo docker login https://docker-registry.int:5000 --username admin --password admin"
                 echo "Commiting image"
-                //sudo docker commit $(sudo docker ps -lq) myapp_php
-                echo "Tagging image"
-                //sudo docker tag myapp_php docker-registry.int:5000/myapp_php
+                sh '''sudo docker commit $(sudo docker ps -lq) ${DOCKER_FINAL_IMAGE}'''
+                //echo "Tagging image"
+                //sh "sudo docker tag myapp-example ${DOCKER_FINAL_IMAGE}""
                 echo "Pushing image to private registry"
-                //sudo docker push docker-registry.int:5000/myapp_php
-                //sh "/var/www/utn-devops-app/build_app.sh '/var/www/utn-devops-app' 'unidad-2-rc' 'ci-server' ${WORKSPACE}"
+                retry(2){
+                    sh '''sudo docker push ${DOCKER_FINAL_IMAGE}'''
+                }
             }
         }
         stage('Unit Tests') {
@@ -63,7 +65,8 @@ pipeline {
                     ssh service-app-user-01@develop 'sudo puppet agent -t ||true'
                     echo "Executing deployment script"
                 '''
-                //ssh service-app-user-01@develop "/var/www/utn-devops-app/build_app.sh '/var/www/utn-devops-app' 'unidad-2-rc'"
+                echo "Deploying to develop"
+                sh '''ssh service-app-user-01@develop "/var/www/utn-devops-app/build_app.sh '/var/www/utn-devops-app' 'unidad-2-rc'"'''
             }
         }
     }

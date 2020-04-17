@@ -32,7 +32,7 @@ RUN docker-php-ext-configure bcmath --enable-bcmath \
     pdo_mysql \
     zip
 
-RUN curl https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN mkdir ~/.composer && curl https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 RUN composer global require hirak/prestissimo
 
