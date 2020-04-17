@@ -13,10 +13,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo "WORKSPACE=${WORKSPACE}"
                 git branch: DEFAULT_BRANCH,
                 url: "$REPO_URL"
-                sh "git checkout -f ${COMMIT_ID}"
                 script {
                     echo "Last commit: ${COMMIT_ID}"
                     sh "git status"
@@ -45,8 +43,6 @@ pipeline {
                 sh "sudo docker login https://docker-registry.int:5000 --username admin --password admin"
                 echo "Commiting image"
                 sh '''sudo docker commit $(sudo docker ps -lq) ${DOCKER_FINAL_IMAGE}'''
-                //echo "Tagging image"
-                //sh "sudo docker tag myapp-example ${DOCKER_FINAL_IMAGE}""
                 echo "Pushing image to private registry"
                 retry(2){
                     sh '''sudo docker push ${DOCKER_FINAL_IMAGE}'''
