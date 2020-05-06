@@ -24,6 +24,7 @@ class jenkins {
     $packages = ['openjdk-8-jre', 'jenkins']
     package { $packages:
         ensure  => installed,
+        install_options => ['--allow-unauthenticated', '-f'],
         require => [
             File['/etc/apt/sources.list.d/jenkins.list'],
             Exec['apt-get-update']
