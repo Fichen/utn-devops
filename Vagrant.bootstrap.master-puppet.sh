@@ -46,10 +46,9 @@ if [ ! -x "$(command -v puppet)" ]; then
 
 fi
 
-# Muevo el archivo de configuración de Puppet al lugar correspondiente
-sudo cp -f /tmp/puppet-master.conf $PUPPET_DIR/puppet.conf
-
-sudo cp -f /tmp/hosts /etc/hosts
+if [ -f "/tmp/hosts" ]; then
+	sudo cp -f /tmp/hosts /etc/hosts
+fi
 
 # muevo los archivos que utiliza Puppet| compartido desde vagrant
 #sudo cp -rf /vagrant/code/* $CODE_DIR
@@ -57,6 +56,9 @@ sudo cp -f /tmp/hosts /etc/hosts
 #Habilito el puerto en el firewall
 sudo ufw allow 8140/tcp
 
-# al detener e iniciar el servicio se regeneran los certificados
-echo "Reiniciando servicio puppetmaster"
-sudo systemctl stop puppetmaster && sudo systemctl start puppetmaster
+# Muevo el archivo de configuración de Puppet al lugar correspondiente
+if [ -f "/tmp/puppet-master.conf" ]; then
+	echo "Copying puppet config file and restarting service"
+	sudo cp -f /tmp/puppet-master.conf $PUPPET_DIR/puppet.conf
+	sudo systemctl stop puppet && sudo systemctl start puppet
+fi

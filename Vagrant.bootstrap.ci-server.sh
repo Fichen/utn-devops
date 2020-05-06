@@ -13,9 +13,7 @@ if [ ! -f "/swapdir/swapfile" ]; then
 	echo vm.swappiness = 10 | sudo tee -a /etc/sysctl.conf
 fi
 
-
 if [ ! -x "$(command -v puppet)" ]; then
-
 	#### Instalacion puppet
 	sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
  	sudo apt-get update
@@ -27,17 +25,26 @@ if [ ! -x "$(command -v puppet)" ]; then
 	sudo timedatectl set-timezone America/Argentina/Buenos_Aires
 	sudo apt-get -y install ntp
 	sudo systemctl restart ntp
+	echo "Ensure puppet agent is always running"
+	sudo puppet resource service puppet ensure=running enable=true
 fi
 
-sudo cp -f /tmp/puppet-agent.conf /etc/puppet/puppet.conf
-
-sudo cp -f /tmp/hosts /etc/hosts
+if [ -f "/tmp/hosts" ]; then
+	sudo cp -f /tmp/hosts /etc/hosts
+fi
 
 #Habilito el puerto en el firewall
 sudo ufw allow 8140/tcp
 
-# al detener e iniciar el servicio se regeneran los certificados
-echo "Reiniciando servicio puppet agent"
-sudo systemctl stop puppet && sudo systemctl start puppet
+if [ -f "/tmp/puppet-agent.conf" ]; then
+	echo "Copying puppet config file and restarting service"
+	sudo cp -f /tmp/puppet-agent.conf /etc/puppet/puppet.conf
+	sudo systemctl stop puppet && sudo systemctl start puppet
+fi
 
-sudo puppet resource service puppet ensure=running enable=true
+PUPPET_EXEC=$(sudo puppet agent -t --noop)
+if [ $? -eq 0 ]; then
+	echo "Try to remove certificates from this node and revoke the certificate in puppet master."
+	echo "Execute the command sudo puppet agent -tv --noop and then login into puppet master and sign in the certificates"
+fi
+

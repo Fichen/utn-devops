@@ -30,7 +30,7 @@ Vagrant.configure("2") do |config|
     subconfig.vm.provision "file", source: "hostConfigs/etc_hosts.txt", destination: "/tmp/hosts"
     subconfig.vm.provision "file", source: "hostConfigs/puppet/puppet-master.conf", destination: "/tmp/puppet-master.conf"
 
-    subconfig.vm.provision :shell, path: "Vagrant.bootstrap.master-puppet.sh"
+    subconfig.vm.provision :shell, path: "Vagrant.bootstrap.master-puppet.sh", run: "always"
     #
   end
 
@@ -55,7 +55,7 @@ Vagrant.configure("2") do |config|
     subconfig.vm.provision "file", source: "hostConfigs/puppet/puppet-agent.develop.conf", destination: "/tmp/puppet-agent.conf"
     subconfig.vm.provision "file", source: "hostConfigs/etc_hosts.txt", destination: "/tmp/hosts"
 
-    subconfig.vm.provision :shell, path: "Vagrant.bootstrap.develop.sh"
+    subconfig.vm.provision :shell, path: "Vagrant.bootstrap.develop.sh", run: "always"
     #
   end
 
@@ -80,7 +80,7 @@ Vagrant.configure("2") do |config|
     subconfig.vm.provision "file", source: "hostConfigs/puppet/puppet-agent.test.conf", destination: "/tmp/puppet-agent.conf"
     subconfig.vm.provision "file", source: "hostConfigs/etc_hosts.txt", destination: "/tmp/hosts"
 
-    subconfig.vm.provision :shell, path: "Vagrant.bootstrap.test.sh"
+    subconfig.vm.provision :shell, path: "Vagrant.bootstrap.test.sh", run: "always"
     #
   end
 
@@ -109,7 +109,7 @@ Vagrant.configure("2") do |config|
     subconfig.vm.provision "file", source: "hostConfigs/puppet/puppet-agent.production.conf", destination: "/tmp/puppet-agent.conf"
     subconfig.vm.provision "file", source: "hostConfigs/etc_hosts.txt", destination: "/tmp/hosts"
 
-    subconfig.vm.provision :shell, path: "Vagrant.bootstrap.ci-server.sh"
+    subconfig.vm.provision :shell, path: "Vagrant.bootstrap.ci-server.sh", run: "always"
     #
   end
 
