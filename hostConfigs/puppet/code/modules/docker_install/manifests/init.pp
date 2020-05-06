@@ -15,12 +15,18 @@ class docker_install {
   exec { 'repository-key':
     command => '/usr/bin/curl -fsSL https://download.docker.com/linux/ubuntu/gpg | /usr/bin/sudo apt-key add -',
     require => File['docker-repository'],
-    unless => '/usr/bin/test -x $(command -v docker)',
+    unless => '/usr/bin/test ! -x $(command -v docker)',
   }
 
   exec { 'apt-update':
     command => '/usr/bin/apt-get update',
-    require => File['docker-repository'],
+    require => [
+      Exec['repository-key'],
+      File['docker-repository']
+    ],
+  } ->
+  exec {'apt-policy':
+    command => '/usr/bin/apt-cache policy docker-ce'
   }
 
   package { $packages:
