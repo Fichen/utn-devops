@@ -26,7 +26,7 @@ Ambiente de desarrollo local para un desarrollador
 
 # Setup
 
-### Host
+## Host
 Iniciar la infraestructura. Suponiendo que el proyecto este en el directorio raíz del usuario actual con el nombre utn-devops.
 Si es Windows mediante la terminal Command Pront
 ```sh
@@ -59,7 +59,7 @@ Ejemplo de ingresar a puppet-master
 vagrant ssh puppet-master
 ```
 
-### puppet-master
+## VM puppet-master
 Firmar todo los nodos para el aprovisionamiento y configuración
 ```sh
 $ sudo puppet cert sign --all
@@ -73,12 +73,13 @@ $ sudo puppet cert list --all
 $ exit
 ```
 
-### ci-server
+## VM ci-server
 Iniciar el servicio registry, construir la imagen base para la aplicación, y liberación de espacio en disco
 ```sh
 vagrant ssh ci-server
 $ sudo su
 # rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin
+# puppet agent -tv
 # cd /home/vagrant/docker-registry
 # docker-compose up -d
 ```
@@ -94,9 +95,9 @@ Puesta en marcha del registry, compilación y subida de la imagen base
 # docker build -f Dockerfile.base -t myapp-example:latest .
 # docker run -d myapp-example
 # docker commit $(docker ps -lq) myapp-example:latest
-# docker tag myapp-example docker-registry.int:5000/myapp-example:latest
+# docker tag myapp-example docker-registry.int:5000/myapp-example:1.0.0
 # docker login https://docker-registry.int:5000 --username admin --password admin
-# docker push docker-registry.int:5000/myapp-example
+# docker push docker-registry.int:5000/myapp-example:1.0.0
 # docker rmi myapp-example
 #
 ```
@@ -108,11 +109,49 @@ Se puede comprar la subida de la imagen base con el siguiente comando
 
 Agregar fingerprints de hosts develop y test a known_hosts. Esto es necesario para que Jenkins pueda hacer el deploy mediante ssh
 ```sh
-$ sudo su jenkins -c "ssh-keyscan -H develop test > ~/.ssh/known_hosts"
+# su jenkins -c "ssh-keyscan -H develop test > ~/.ssh/known_hosts"
 ```
 
-Comandos útiles para borrar imágenes y containers. Sólo ejecutar en caso de querer optimizar espacio en disco
+### Steps to configure CI/CD
+* Copy initial password and paste it into Jenkins utl
 ```sh
-# docker system prune -a
-# docker image prune -a
+ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```
+* Enter in [Jenkins CI Server](http://ci-server.utn-devops.localhost:8082/) and paste the hash here.
+* Clic on "Install Suggested Plugins"
+
+Create an Admin user. Fields to complete:
+```
+User
+Password
+Confirm Password
+Full name
+Email
+```
+
+- Clic on "Save and Continue"
+- Clic on "Save and Finish"
+- Clic on "Start using Jenkins"
+
+__Job example creation__
+- Enter in ["Create new Job"](http://ci-server.utn-devops.localhost:8082/newJob)
+- Complete field "Enter an item name": ie, app-test
+- Select option: "Pipeline"
+- Clic on "Ok"
+- Check "discard old builds"
+  - Number of build to keep: 3
+- Check "Do not allow concurrent builds"
+- Check Repository SCM
+  - Complete with: * * * * *
+- Pipeline
+  - Definition: select "Pipeline script from SCM"
+  - SCM: Git
+  - Repository URL: https://github.com/Fichen/utn-devops.git
+  - Branch Specifier: */unidad-5-integrador
+  - Script Path: hostConfigs/jenkins/Jenkinsfile
+  - Clic on "Apply" & "Save"
+
+__Test pipeline__
+
+- Clic on ["Build now"](http://ci-server.utn-devops.localhost:8082/job/app-test/build?delay=0sec)
+- Enter into the build and clic on "console output" to verify the job. To check the first build enter [here](http://ci-server.utn-devops.localhost:8082/job/app-test/1/console)
