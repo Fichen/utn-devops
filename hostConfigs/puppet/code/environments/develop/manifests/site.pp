@@ -26,7 +26,12 @@ node 'develop.utn-devops.int' {
         app => $app
     }
 
-    include docker_install
+    class { 'docker_install':
+        variables => {
+            compose_version => "1.25.4"
+        }
+    }
+
     class { 'docker_install::certificates':
         variables => $app
     }

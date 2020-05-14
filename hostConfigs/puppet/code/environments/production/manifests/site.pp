@@ -9,9 +9,6 @@ node 'ci-server.utn-devops.int' {
     case $::operatingsystem {
         'Debian', 'Ubuntu' : {
 
-            include docker_install
-            class { 'docker_install::registry': }
-
              $app = {
                 name => 'ci-server-devops-utn',
                 env => 'develop',
@@ -32,11 +29,18 @@ node 'ci-server.utn-devops.int' {
                 app => $app
             }
 
+            class { 'docker_install':
+                variables => {
+                    compose_version => "1.25.4"
+                }
+            }
+            class { 'docker_install::registry': }
+
             include jenkins
             #include jenkins::packages_dependencies
             include jenkins::ssh_keys
 
         }
-        default  : { notify {"$::operatingsystem no esta soportado":} }
+        default  : { notify {"$::operatingsystem is not supported":} }
     }
 }

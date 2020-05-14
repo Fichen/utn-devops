@@ -1,5 +1,5 @@
-class docker_install {
-  $composeVersion = "1.25.4"
+class docker_install($variables) {
+  $composeVersion = $variables['compose_version']
 
   $packages = ['apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'docker-ce']
 
