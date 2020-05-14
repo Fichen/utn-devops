@@ -11,6 +11,12 @@ El stack de herramientas es el siguiente:
   - [Jenkins](https://jenkins.io/)
   - [Laravel](https://laravel.com/) como aplicación de ejemplo
 
+## Requisitos
+ __Instalación en el equipo host:__
+ - Vagrant
+ - Virtualbox
+ - Git
+
 ## La arquitectura planteada consiste de los siguientes servidores:
 ### puppet-master
 Configuration management para todos los nodos. Se encarga de aprovisionar y mantener los nodos en el estado deseado. Por ejemplo: ssh keys, usuarios, etc.
@@ -60,13 +66,30 @@ vagrant ssh puppet-master
 ```
 
 ## VM puppet-master
-Firmar todo los nodos para el aprovisionamiento y configuración
+Con este comando se firman todo los nodos agent. Esto hay que realizarlo una vez que están todas los ambientes arriba.
 ```sh
 $ sudo puppet cert sign --all
+$ exit
 ```
+
+Previo a esto hay que ingrear a ci-server, develop y test para generar los certificados SSL.
+Ejemplo para ci-server
+```sh
+vagrant ssh ci-server
+$ sudo puppet agent -t
+$ exit
+```
+
+Luego hay que ingresar a puppet-master y firmar el certificado. En este caso es para el servidor ci-server
+```sh
+vagrant ssh puppet-master
+$ sudo puppet cert sign ci-server.utn-devops.int
+```
+
 Se puede verificar la firma si observa un signo "+" como prefijo del nombre de dominio
 ```sh
 $ sudo puppet cert list --all
+Notice: Signed certificate request for ca
 + "ci-server.utn-devops.int"           (SHA256) E2:EC:16:DA:7A:49:C3:8C:FC:0A:46:13:10:27:37:3C:5D:93:55:D6:7D:3D:BD:CE:75:3B:BE:08:E8:25:C5:62
 + "develop.utn-devops.int"             (SHA256) DD:39:17:54:4F:DF:EB:02:25:92:6A:4B:F6:32:5A:64:0E:89:ED:E1:2A:E9:51:E8:82:0B:F5:47:23:A2:47:7C
 + "puppet-master.utn-devops.localhost" (SHA256) 0C:EB:34:72:06:CB:99:CA:9D:D7:AC:E3:7A:B7:9D:0B:43:11:BD:7D:9E:60:C4:79:2D:5A:24:A3:A2:BB:D2:48 (alt names: "DNS:puppet", "DNS:puppet-master", "DNS:puppet-master.utn-devops.localhost")
@@ -105,11 +128,6 @@ Se puede comprar la subida de la imagen base con el siguiente comando
 ```sh
 # curl -u admin:admin https://docker-registry.int:5000/v2/_catalog
 {"repositories":["myapp-example"]}
-```
-
-Agregar fingerprints de hosts develop y test a known_hosts. Esto es necesario para que Jenkins pueda hacer el deploy mediante ssh
-```sh
-# su jenkins -c "ssh-keyscan -H develop test > ~/.ssh/known_hosts"
 ```
 
 ### Steps to configure CI/CD
@@ -155,3 +173,9 @@ __Test pipeline__
 
 - Clic on ["Build now"](http://ci-server.utn-devops.localhost:8082/job/app-test/build?delay=0sec)
 - Enter into the build and clic on "console output" to verify the job. To check the first build enter [here](http://ci-server.utn-devops.localhost:8082/job/app-test/1/console)
+
+__Check deploy at develop server__
+ - Enter into http://develop.utn-devops.int:8081
+
+You should view some three boxes with some data. The first one that is on the top should have a message like this:
+ - "Aplicación de ejemplo: PHP (Laravel) + MySQL"
