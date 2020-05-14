@@ -27,7 +27,7 @@ node 'develop.utn-devops.int' {
     }
 
     include docker_install
-    #class { 'docker_install::certificates':
-    #    variables => $app
-    #}
+    class { 'docker_install::certificates':
+        variables => $app
+    }
 }

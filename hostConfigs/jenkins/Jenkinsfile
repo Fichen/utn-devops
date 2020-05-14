@@ -18,14 +18,16 @@ pipeline {
                 script {
                     echo "Last commit: ${COMMIT_ID}"
                     sh "git status"
-                    echo "Applying puppet manifests"
-                    sh 'sudo puppet agent -t || true'
+                    // echo "Applying puppet manifests"
+                    // sh 'sudo puppet agent -t || true'
                 }
             }
         }
         stage('Build') {
             steps {
                 sh "sudo cp -f /var/www/utn-devops-app/.env ."
+                echo "login to private registry"
+                sh "sudo docker login https://docker-registry.int:5000 --username admin --password admin"
                 sh "sudo docker-compose pull"
                 sh "sudo docker-compose build"
                 sh "sudo docker-compose stop"
@@ -39,8 +41,6 @@ pipeline {
                 sh "sudo docker exec apache2_php php artisan migrate:refresh"
                 sh "sudo docker exec apache2_php php artisan config:clear"
                 sh  '''sudo docker exec apache2_php bash -c "echo ${COMMIT_ID} > /COMMIT_VALIDATION" '''
-                echo "login to private registry"
-                sh "sudo docker login https://docker-registry.int:5000 --username admin --password admin"
                 echo "Commiting image"
                 sh '''sudo docker commit $(sudo docker ps -lq) ${DOCKER_FINAL_IMAGE}'''
                 echo "Pushing image to private registry"
