@@ -2,12 +2,11 @@ pipeline {
     agent any
 
     environment {
-        //APP_DIR = 'myapp'
         DEFAULT_BRANCH = 'unidad-2-rc'
         WORKSPACE = sh(returnStdout: true, script: 'pwd').trim()
         COMMIT_ID = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
         REPO_URL = 'https://github.com/Fichen/utn-devops-app.git'
-        DOCKER_FINAL_IMAGE = 'docker-registry.int:5000/myapp-example'
+        DOCKER_FINAL_IMAGE = 'docker-registry.int:5000/myapp-example:latest'
     }
 
     stages {

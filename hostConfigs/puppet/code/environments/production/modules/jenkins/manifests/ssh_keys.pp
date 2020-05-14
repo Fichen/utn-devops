@@ -27,4 +27,11 @@ class jenkins::ssh_keys {
         source => 'puppet:///modules/jenkins/jenkins_id_rsa.pub',
         require => File['jenkins-create-ssh-folder'],
     }
+
+    # Add fingerprints of develop and test environments to known host. It's necessary to deploy
+    exec { 'known-host-ssh-to-pipeline-environments':
+        command => 'sudo su jenkins -c "ssh-keyscan -H develop test > ~/.ssh/known_hosts"',
+        path    => ['/usr/bin', '/usr/local/bin'],
+        require => File['jenkins-create-ssh-folder'],
+    }
 }

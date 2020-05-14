@@ -22,7 +22,7 @@ function regenerate_docker_images() {
     sudo docker-compose up -d
     echo "Running migration scrips"
     sudo docker exec apache2_php chmod 0777 -R storage bootstrap/cache
-    sudo docker exec apache2_php php artisan migrate:refresh
+    sudo docker exec apache2_php php artisan migrate
     sudo docker exec apache2_php php artisan config:clear
 }
 
