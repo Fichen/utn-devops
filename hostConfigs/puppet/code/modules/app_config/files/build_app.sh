@@ -1,5 +1,9 @@
 #!/bin/bash
 
+set -e
+trap "exit 1" ERR
+
+
 APP_WORKDIR=$1
 COMMIT=$2
 DEFAULT_BRANCH="unidad-2-rc"
@@ -11,19 +15,28 @@ function command_as_current_user_dir() {
     CURRENT_USER=$(ls -ld . | awk '{print $3}')
     echo "Executing: sudo su $CURRENT_USER -c ${ARG} "
     sudo su $CURRENT_USER -c " ${ARG} "
+
+    if [ $? -ne 0 ]; then
+        echo "Error: aborting deploy"
+        exit 1
+    fi
 }
 
 function regenerate_docker_images() {
     cd "$APP_WORKDIR"
     echo "Pulling images"
-    sudo docker-compose pull
+    command_as_current_user_dir 'sudo docker-compose pull'
     echo "Restarting up and configuring app"
-    sudo docker-compose stop
-    sudo docker-compose up -d
+    command_as_current_user_dir 'sudo docker-compose stop'
+    command_as_current_user_dir 'sudo docker-compose up -d'
     echo "Running migration scrips"
-    sudo docker exec apache2_php chmod 0777 -R storage bootstrap/cache
-    sudo docker exec apache2_php php artisan migrate
-    sudo docker exec apache2_php php artisan config:clear
+    command_as_current_user_dir 'sudo docker exec apache2_php chmod 0777 -R storage bootstrap/cache'
+    command_as_current_user_dir 'sudo docker exec apache2_php php artisan migrate'
+    command_as_current_user_dir 'sudo docker exec apache2_php php artisan config:clear'
+}
+
+function check_command_exit_code() {
+    local $command=$1
 }
 
 if [ "$APP_WORKDIR" = "" ]; then
