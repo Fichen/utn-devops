@@ -65,51 +65,73 @@ Ejemplo de ingresar a puppet-master
 vagrant ssh puppet-master
 ```
 
-## VM puppet-master
-Con este comando se firman todo los nodos agent. Esto hay que realizarlo una vez que están todas los ambientes arriba.
+## Puppet
+Una vez instalados todas las VMs ingresar a puppet-master y revocar todos los certificados:
 ```sh
-$ sudo puppet cert sign --all
+vagrant ssh puppet-master
+$ sudo puppet node clean ci-server.utn-devops.int develop.utn-devops.int test.utn-devops.int
+```
+Se pueden verifican los certificados firmados si observa un signo "+" como prefijo del nombre de dominio. Ejemplo
+```sh
+$ sudo puppet cert list --all
+Notice: Signed certificate request for ca
++ "puppet-master.utn-devops.int" (SHA256) 0C:EB:34:72:06:CB:99:CA:9D:D7:AC:E3:7A:B7:9D:0B:43:11:BD:7D:9E:60:C4:79:2D:5A:24:A3:A2:BB:D2:48 (alt names: "DNS:puppet", "DNS:puppet-master", "DNS:puppet-master.utn-devops.int")
 $ exit
 ```
 
-Previo a esto hay que ingrear a ci-server, develop y test para generar los certificados SSL.
+Para comenzar a utilizar Puppet en los agentes, hay que borrar los certificados autogenerados en la instalación y realizar una petición a Master
+Esto hay que realizarlo en los servidores: ci-server, develop y test para generar los certificados SSL.
 Ejemplo para ci-server
 ```sh
 vagrant ssh ci-server
-$ sudo puppet agent -t
+$ sudo rm -rf /var/lib/puppet/ssl
+$ sudo puppet agent -tv
 $ exit
 ```
+__Repetir esto último para develop y test__
+
+
+Si durante la ejecución de puppet agent -tv se observa algún error, esperar que finalice y ejecutarlo nuevamente.
+Hay ocasiones que por timeout algunos paquetes no logran instalarse correctamente. Ej:
+```sh
+Error: Command exceeded timeout
+Error: /Stage[main]/Docker_install/Exec[install-docker-compose]/returns: change from 'notrun' to ['0'] failed: Command exceeded timeout
+Notice: /Stage[main]/Docker_install/Exec[permission-docker-compose]: Dependency Exec[install-docker-compose] has failures: true
+Warning: /Stage[main]/Docker_install/Exec[permission-docker-compose]: Skipping because of failed dependencies
+```
+
 
 Luego hay que ingresar a puppet-master y firmar el certificado. En este caso es para el servidor ci-server
 ```sh
 vagrant ssh puppet-master
 $ sudo puppet cert sign ci-server.utn-devops.int
+Signing Certificate Request for:
+  "ci-server.utn-devops.int" (SHA256) 4B:60:DB:D0:17:B2:A3:14:59:FB:47:F3:B7:6C:99:D8:C6:DD:6E:43:63:2A:CD:67:B1:C4:34:AE:73:24:E7:F6
+Notice: Signed certificate request for ci-server.utn-devops.int
+Notice: Removing file Puppet::SSL::CertificateRequest ci-server.utn-devops.int at '/var/lib/puppet/ssl/ca/requests/ci-server.utn-devops.int.pem'
 ```
 
-Se puede verificar la firma si observa un signo "+" como prefijo del nombre de dominio
+Con este comando se pueden firman todos los nodos agent, sin necesidad de espeficiar el dominio.
 ```sh
-$ sudo puppet cert list --all
-Notice: Signed certificate request for ca
-+ "ci-server.utn-devops.int"           (SHA256) E2:EC:16:DA:7A:49:C3:8C:FC:0A:46:13:10:27:37:3C:5D:93:55:D6:7D:3D:BD:CE:75:3B:BE:08:E8:25:C5:62
-+ "develop.utn-devops.int"             (SHA256) DD:39:17:54:4F:DF:EB:02:25:92:6A:4B:F6:32:5A:64:0E:89:ED:E1:2A:E9:51:E8:82:0B:F5:47:23:A2:47:7C
-+ "puppet-master.utn-devops.localhost" (SHA256) 0C:EB:34:72:06:CB:99:CA:9D:D7:AC:E3:7A:B7:9D:0B:43:11:BD:7D:9E:60:C4:79:2D:5A:24:A3:A2:BB:D2:48 (alt names: "DNS:puppet", "DNS:puppet-master", "DNS:puppet-master.utn-devops.localhost")
+$ sudo puppet cert sign --all
 $ exit
 ```
 
 ## VM ci-server
-Iniciar el servicio registry, construir la imagen base para la aplicación, y liberación de espacio en disco
+
+__Docker Registry__
+
+
 ```sh
 vagrant ssh ci-server
 $ sudo su
-# rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin
-# puppet agent -tv
 # cd /home/vagrant/docker-registry
 # docker-compose up -d
 ```
 Se puede testear que funcione el contenedor y la autenticación con
 ```sh
 # curl -u admin:admin https://docker-registry.int:5000/v2/_catalog
-{"repositories":[]}
+{"repositories":["myapp-example"]}
 ```
 Puesta en marcha del registry, compilación y subida de la imagen base
 
@@ -121,13 +143,11 @@ Puesta en marcha del registry, compilación y subida de la imagen base
 # docker tag myapp-example docker-registry.int:5000/myapp-example:1.0.0
 # docker login https://docker-registry.int:5000 --username admin --password admin
 # docker push docker-registry.int:5000/myapp-example:1.0.0
-# docker rmi myapp-example
-#
 ```
-Se puede comprar la subida de la imagen base con el siguiente comando
+Se puede comprobar la subida de la imagen base con el siguiente comando
 ```sh
-# curl -u admin:admin https://docker-registry.int:5000/v2/_catalog
-{"repositories":["myapp-example"]}
+# curl -u admin:admin https://docker-registry.int:5000/v2/myapp-example/tags/list
+{"name":"myapp-example","tags":["1.0.0","latest"]}
 ```
 
 ### Steps to configure CI/CD
@@ -140,11 +160,11 @@ Se puede comprar la subida de la imagen base con el siguiente comando
 
 Create an Admin user. Fields to complete:
 ```
-User
-Password
-Confirm Password
-Full name
-Email
+User: admin
+Password: secret
+Confirm Password: secret
+Full name: Admin
+Email: admin@test
 ```
 
 - Clic on "Save and Continue"
@@ -177,5 +197,7 @@ __Test pipeline__
 __Check deploy at develop server__
  - Enter into http://develop.utn-devops.int:8081
 
-You should view some three boxes with some data. The first one that is on the top should have a message like this:
+You should view three boxes with some data. The first one which is on the top it should have a message like this:
  - "Aplicación de ejemplo: PHP (Laravel) + MySQL"
+
+__That is pretty much all__
