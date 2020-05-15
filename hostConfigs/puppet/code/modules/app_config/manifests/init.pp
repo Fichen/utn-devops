@@ -7,22 +7,22 @@ class app_config($app) {
     }
 
     file { $environment_var_dir:
-        owner => 'service-app-user-01',
-        group => 'service-app-user-01',
+        owner => $app['user'],
+        group => $app['group'],
         mode => '0755',
         ensure => directory,
     }
 
     file { "${environment_var_dir}/.ssh":
-        owner => 'service-app-user-01',
-        group => 'service-app-user-01',
+        owner => $app['user'],
+        group => $app['group'],
         mode => '0700',
         ensure => directory,
     }
 
     file { "${environment_var_dir}/.docker":
-        owner => 'service-app-user-01',
-        group => 'service-app-user-01',
+        owner => $app['user'],
+        group => $app['group'],
         mode => '0700',
         ensure => directory,
     }
@@ -30,8 +30,8 @@ class app_config($app) {
     file {'ssh-keys-service-user':
         path => "${environment_var_dir}/.ssh/authorized_keys",
         ensure => present,
-        owner => 'service-app-user-01',
-        group => 'service-app-user-01',
+        owner => $app['user'],
+        group => $app['group'],
         mode => '0600',
         content => epp('app_config/authorized_keys.epp'),
     }
@@ -48,8 +48,8 @@ class app_config($app) {
         ensure => present,
         source => 'puppet:///modules/app_config/build_app.sh',
         mode => '0755',
-        owner => 'service-app-user-01',
-        group => 'service-app-user-01',
+        owner => $app['user'],
+        group => $app['group'],
         require => File[$environment_var_dir],
     }
 
