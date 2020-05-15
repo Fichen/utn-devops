@@ -61,7 +61,11 @@ pipeline {
                     echo "Executing deployment script"
                 '''
                 echo "Deploying to develop"
-                sh '''ssh service-app-user-01@develop "/var/www/utn-devops-app/build_app.sh '/var/www/utn-devops-app' 'unidad-2-rc'"'''
+                script {
+                    def status = sh(returnStdout: true, script: "ssh service-app-user-01@develop /var/www/utn-devops-app/build_app.sh '/var/www/utn-devops-app' 'unidad-2-rc'").trim()
+                    echo "Deploy status: ${status}"
+                    echo "Deploy status end"
+                }
             }
         }
     }
