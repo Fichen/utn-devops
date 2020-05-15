@@ -36,11 +36,13 @@ class docker_install($variables) {
 
   exec { 'install-docker-compose':
     command => "/usr/bin/sudo curl -L \"https://github.com/docker/compose/releases/download/${composeVersion}/docker-compose-$(uname -s)-$(uname -m)\" -o /usr/local/bin/docker-compose",
-    onlyif => '/usr/bin/test ! -x /usr/local/bin/docker-compose',
-  } ->
+    onlyif => '/usr/bin/test ! -f /usr/local/bin/docker-compose',
+  }
+
   exec { 'permission-docker-compose':
-    command => 'sudo chmod +x /usr/local/bin/docker-compose',
-    path => ['/usr/bin'],
+    command => 'sudo chmod +rx /usr/local/bin/docker-compose',
+    path => ['/usr/bin', '/usr/local/bin/'],
+    require => Exec['install-docker-compose'],
   }
 
   #conflict with docker login credentials
