@@ -71,6 +71,7 @@ Ejemplo de ingresar a puppet-master
 vagrant ssh puppet-master
 ```
 
+
 ## Puppet
 Una vez instalados todas las VMs ingresar a puppet-master y revocar todos los certificados:
 ```sh
