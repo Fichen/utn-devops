@@ -1,6 +1,6 @@
 # Práctica integradora
 
-Esta práctica tiene como objetivo mostrar la utilización un stack de herramientas para instanciar un pipeline de Integración Continua y Despliegue Continuo (CI/CD)
+Esta práctica tiene como objetivo mostrar la utilización de un stack de herramientas para instanciar un pipeline de Integración Continua y Despliegue Continuo (CI/CD)
 
 El stack de herramientas es el siguiente:
   - [Vagrant](https://www.vagrantup.com/)
