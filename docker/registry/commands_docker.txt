@@ -1,0 +1,18 @@
+#Private key
+openssl genrsa -des3 -out certs/domain.key 1024
+#CSR
+openssl req -new -key certs/domain.key -out certs/domain.csr
+#Remove Passphrase
+cp certs/domain.key certs/domain.key.org
+openssl rsa -in certs/domain.key.org -out certs/domain.key
+#Generate self signed certificate
+openssl x509 -req -days 365 -in certs/domain.csr -signkey certs/domain.key -out certs/domain.crt
+
+chmod 400 host.key
+cp host.cert cert/domain.crt
+cp host.key cert/domain.key
+sudo mkdir -p /etc/docker/certs.d/docker-registry:5000
+sudo cp certs/domain.crt /etc/docker/certs.d/docker-registry:5000/ca.crt
+sudo systemctl restart docker
+
+

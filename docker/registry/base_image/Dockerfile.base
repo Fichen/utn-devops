@@ -1,0 +1,49 @@
+FROM php:7.2-apache
+
+LABEL maintainer="David Fichtenbaum"
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    g++ \
+    make \
+    git \
+    unzip \
+    zip \
+    libbz2-dev \
+    libfreetype6-dev \
+    libicu-dev \
+    libjpeg-dev \
+    libmcrypt-dev \
+    libpng-dev \
+    libreadline-dev \
+    libcurl4-openssl-dev \
+    libxml2-dev \
+    libzip-dev \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin
+
+RUN docker-php-ext-configure bcmath --enable-bcmath \
+    && docker-php-ext-configure pdo_mysql --with-pdo-mysql \
+    && docker-php-ext-configure mbstring --enable-mbstring \
+    && docker-php-ext-configure zip --with-libzip \
+    && docker-php-ext-install \
+    bcmath \
+    bz2 \
+    calendar \
+    pdo_mysql \
+    zip
+
+RUN mkdir ~/.composer && curl https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+RUN composer global require hirak/prestissimo
+
+WORKDIR /var/www/html
+
+EXPOSE 80
+
+## Sentences to apply into Dockerfile at repository https://github.com/Fichen/utn-devops-app branch unidad-2-rc
+#FROM docker-registry.int:5000/myapp-example
+#COPY ./docker-configs/php/php.ini $PHP_INI_DIR/custom.ini
+#COPY ./docker-configs/httpd/app.site.conf /etc/apache2/sites-available/000-default.conf
+#WORKDIR /var/www/html
+#COPY . /var/www/html
+#EXPOSE 8081

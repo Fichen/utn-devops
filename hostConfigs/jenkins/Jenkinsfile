@@ -1,0 +1,72 @@
+pipeline {
+    agent any
+
+    environment {
+        DEFAULT_BRANCH = 'unidad-2-rc'
+        WORKSPACE = sh(returnStdout: true, script: 'pwd').trim()
+        COMMIT_ID = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+        REPO_URL = 'https://github.com/Fichen/utn-devops-app.git'
+        DOCKER_FINAL_IMAGE = 'docker-registry.int:5000/myapp-example:latest'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: DEFAULT_BRANCH,
+                url: "$REPO_URL"
+                script {
+                    echo "Last commit: ${COMMIT_ID}"
+                    sh "git status"
+                    // echo "Applying puppet manifests"
+                    // sh 'sudo puppet agent -t || true'
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                sh "sudo cp -f /var/www/utn-devops-app/.env ."
+                echo "login to private registry"
+                sh "sudo docker login https://docker-registry.int:5000 --username admin --password admin"
+                sh "sudo docker-compose pull"
+                sh "sudo docker-compose build"
+                sh "sudo docker-compose stop"
+                sh "sudo docker-compose up -d"
+                echo "Checking syntax error"
+                sh "sudo docker exec apache2_php find . -path ./vendor -prune -o -name \\*.php -exec php -l \"{}\" \\;"
+                retry(2) {
+                    sh "sudo docker exec apache2_php composer install --no-scripts --prefer-dist"
+                }
+                sh "sudo docker exec apache2_php chmod 0777 -R storage bootstrap/cache"
+                sh "sudo docker exec apache2_php php artisan migrate:refresh"
+                sh "sudo docker exec apache2_php php artisan config:clear"
+                sh  '''sudo docker exec apache2_php bash -c "echo ${COMMIT_ID} > /COMMIT_VALIDATION" '''
+                echo "Commiting image"
+                sh '''sudo docker commit $(sudo docker ps -lq) ${DOCKER_FINAL_IMAGE}'''
+                echo "Pushing image to private registry"
+                retry(2){
+                    sh '''sudo docker push ${DOCKER_FINAL_IMAGE}'''
+                }
+            }
+        }
+        stage('Unit Tests') {
+            steps {
+                sh "sudo docker exec apache2_php ./vendor/bin/phpunit -c phpunit.xml"
+            }
+        }
+        stage('Deploy to develop') {
+            steps {
+                sh '''
+                    echo "Applying puppet manifests"
+                    ssh service-app-user-01@develop 'sudo puppet agent -t ||true'
+                    echo "Executing deployment script"
+                '''
+                echo "Deploying to develop"
+                script {
+                    def status = sh(returnStdout: true, script: "ssh service-app-user-01@develop /var/www/utn-devops-app/build_app.sh '/var/www/utn-devops-app' 'unidad-2-rc'").trim()
+                    echo "Deploy status: ${status}"
+                    echo "Deploy status end"
+                }
+            }
+        }
+    }
+}
