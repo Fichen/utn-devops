@@ -26,9 +26,9 @@ Además, en este mismo servidor contiene un registry privado para tener una imag
 ### develop
 Ambiente de pruebas para desarrolladores
 ### test
-Ambiente de pruebas de aceptación
+Ambiente de pruebas de aceptación. __NO INTEGRADO AL PIPELINE__
 ### local-dev
-Ambiente de desarrollo local para un desarrollador
+Ambiente de desarrollo local para un desarrollador. Este ambiente es creado por un Vagrantfile, ubicado en la aplicación de [demo](https://github.com/Fichen/utn-devops-app.git) en el branch demo
 
 # Setup
 
@@ -61,7 +61,7 @@ Para la edición se necesita permisos de administrador.
 10.0.0.13       ci-server.utn-devops.int  ci-server docker-registry.int
 ```
 
-Iniciar las máquinas virtuales y aprovisionarlas.
+Crear e iniciar las máquinas virtuales y aprovisionarlas. Este comando demora bastante.
 ```sh
 vagrant up --provision
 ```
@@ -76,13 +76,16 @@ vagrant ssh puppet-master
 Una vez instalados todas las VMs ingresar a puppet-master y revocar todos los certificados:
 ```sh
 vagrant ssh puppet-master
+$ sudo puppet cert list --all
+"ci-server.utn-devops.int"     (SHA256) F7:CD:0D:A2:30:EA:88:6C:69:97:D9:F2:54:F8:85:D9:67:2E:9A:D5:D2:A2:2E:A8:0A:BA:A7:7B:F6:A8:BE:59
+  "develop.utn-devops.int"       (SHA256) 75:71:BC:90:CA:8E:2A:77:22:5C:B5:20:50:9A:53:48:DE:26:C5:4C:E1:78:30:CC:33:E6:C9:EF:10:A9:CB:69
+  "test.utn-devops.int"          (SHA256) BA:93:5A:9B:EA:03:70:2C:02:0D:BD:1B:8D:8B:73:6A:46:59:0A:82:7C:EC:84:9C:46:07:5A:72:7F:B3:3F:0E
 $ sudo puppet node clean ci-server.utn-devops.int develop.utn-devops.int test.utn-devops.int
 ```
-Se pueden verifican los certificados firmados si observa un signo "+" como prefijo del nombre de dominio. Ejemplo
+Se pueden verifican los certificados firmados si observa un signo "+" como prefijo del nombre de dominio. Asegurarse en este caso no debiera haber ningún dominio de los listados anteriormente
 ```sh
 $ sudo puppet cert list --all
-Notice: Signed certificate request for ca
-+ "puppet-master.utn-devops.int" (SHA256) 0C:EB:34:72:06:CB:99:CA:9D:D7:AC:E3:7A:B7:9D:0B:43:11:BD:7D:9E:60:C4:79:2D:5A:24:A3:A2:BB:D2:48 (alt names: "DNS:puppet", "DNS:puppet-master", "DNS:puppet-master.utn-devops.int")
++ "puppet-master.utn-devops.int" (SHA256) 54:53:D9:8B:4C:1D:57:33:07:F0:EA:43:C5:3E:9E:21:67:3D:5C:5A:EC:69:82:9E:36:BE:1F:2E:53:57:0F:C8 (alt names: "DNS:puppet", "DNS:puppet-master", "DNS:puppet-master.utn-devops.int")
 $ exit
 ```
 
@@ -95,22 +98,19 @@ $ sudo rm -rf /var/lib/puppet/ssl
 $ sudo puppet agent -tv
 $ exit
 ```
+
 __Repetir esto último para develop y test__
 
 
-Si durante la ejecución de puppet agent -tv se observa algún error, esperar que finalice y ejecutarlo nuevamente.
-Hay ocasiones que por timeout algunos paquetes no logran instalarse correctamente. Ej:
-```sh
-Error: Command exceeded timeout
-Error: /Stage[main]/Docker_install/Exec[install-docker-compose]/returns: change from 'notrun' to ['0'] failed: Command exceeded timeout
-Notice: /Stage[main]/Docker_install/Exec[permission-docker-compose]: Dependency Exec[install-docker-compose] has failures: true
-Warning: /Stage[main]/Docker_install/Exec[permission-docker-compose]: Skipping because of failed dependencies
-```
-
-
-Luego hay que ingresar a puppet-master y firmar el certificado. En este caso es para el servidor ci-server
+Luego hay que ingresar a puppet-master y firmar el certificado. En este caso es para el servidor ci-server. Primero verificamos que
+existan certificado pendientes de firmar. Son lo que no poseen el prefijo del simbolo +
 ```sh
 vagrant ssh puppet-master
+$ sudo puppet cert list --all
+ "develop.utn-devops.int"       (SHA256) F2:C5:81:02:1B:06:40:7D:C5:D4:49:BB:08:7A:DA:75:BD:14:47:18:8B:32:9D:17:72:8A:A9:F0:7A:29:E8:29
+ "test.utn-devops.int"          (SHA256) 35:2F:B4:6D:6C:79:A3:B8:C5:3C:61:F7:7F:C7:CD:E5:BD:FA:C8:CC:07:63:1F:AE:80:A3:F3:8A:1D:C5:A5:F0
+ "ci-server.utn-devops.int"     (SHA256) 1D:F1:E5:5D:4D:88:B2:3A:97:79:76:23:4A:49:85:87:55:D5:97:A4:E0:A2:A1:6D:17:C2:A3:0A:D7:96:BC:7B
+ + "puppet-master.utn-devops.int" (SHA256) 54:53:D9:8B:4C:1D:57:33:07:F0:EA:43:C5:3E:9E:21:67:3D:5C:5A:EC:69:82:9E:36:BE:1F:2E:53:57:0F:C8 (alt names: "DNS:puppet", "DNS:puppet-master", "DNS:puppet-master.utn-devops.int")
 $ sudo puppet cert sign ci-server.utn-devops.int
 Signing Certificate Request for:
   "ci-server.utn-devops.int" (SHA256) 4B:60:DB:D0:17:B2:A3:14:59:FB:47:F3:B7:6C:99:D8:C6:DD:6E:43:63:2A:CD:67:B1:C4:34:AE:73:24:E7:F6
@@ -121,7 +121,36 @@ Notice: Removing file Puppet::SSL::CertificateRequest ci-server.utn-devops.int a
 Con este comando se pueden firman todos los nodos agent, sin necesidad de espeficiar el dominio.
 ```sh
 $ sudo puppet cert sign --all
+$ sudo puppet cert list --all
 $ exit
+```
+
+__Aplicar manifiestos de Puppet en los agentes manualmente.__
+Realizarlo en este orden: ci-server, develop, test
+```sh
+vagrant ssh ci-server
+$ sudo puppet agent -tv
+$ exit
+```
+```sh
+vagrant ssh develop
+$ sudo puppet agent -tv
+$ exit
+```
+
+```sh
+vagrant ssh test
+$ sudo puppet agent -tv
+$ exit
+```
+
+Si durante la ejecución de puppet agent -tv se observa algún error, esperar que finalice y ejecutarlo nuevamente.
+Hay ocasiones que por timeout algunos paquetes no logran instalarse correctamente. Ej:
+```sh
+Error: Command exceeded timeout
+Error: /Stage[main]/Docker_install/Exec[install-docker-compose]/returns: change from 'notrun' to ['0'] failed: Command exceeded timeout
+Notice: /Stage[main]/Docker_install/Exec[permission-docker-compose]: Dependency Exec[install-docker-compose] has failures: true
+Warning: /Stage[main]/Docker_install/Exec[permission-docker-compose]: Skipping because of failed dependencies
 ```
 
 ## VM ci-server
