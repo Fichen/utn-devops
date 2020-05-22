@@ -31,9 +31,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "agent.demo-puppet.int" do | subconfig |
     subconfig.vm.box = BOX
 
-    subconfig.vm.network "forwarded_port", guest: 8081, guest_ip: IP_AGENT, host: 8081, auto_correct: true
-    subconfig.vm.network "forwarded_port", guest: 8082, guest_ip: IP_AGENT, host: 8082, auto_correct: true
-    subconfig.vm.network "forwarded_port", guest: 4400, guest_ip: IP_AGENT, host: 4400, auto_correct: true
+    subconfig.vm.network "forwarded_port", guest: 80, guest_ip: IP_AGENT, host: 8080, auto_correct: true
     subconfig.vm.network "forwarded_port", guest: 8140, guest_ip: IP_AGENT, host: 8140, auto_correct: true
     subconfig.vm.network :private_network, ip: IP_AGENT
 
