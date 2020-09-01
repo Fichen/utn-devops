@@ -2,28 +2,26 @@ class jenkins {
 
     # get key
     exec { 'install_jenkins_key':
-        command => '/usr/bin/wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -',
+        command => '/usr/bin/wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -',
     }
 
         # source file
     file { '/etc/apt/sources.list.d/jenkins.list':
         content => "deb https://pkg.jenkins.io/debian-stable binary/\n",
-                ensure => present,
+        ensure => present,
         mode    => '0644',
         owner   => root,
         group   => root,
         require => Exec['install_jenkins_key'],
     } -> #ordeno la secuencia de pasos en el tiempo mediante el operador "->".
-                 # se utiliza para encadenar semanticamente distintas declaraciones
+    # se utiliza para encadenar semanticamente distintas declaraciones
     # update
     exec { 'apt-get update':
         command => '/usr/bin/apt-get update',
-        #require => File['/etc/apt/sources.list.d/jenkins.list'],
     }
 
     #install jenkins
     $enhancers = [ 'openjdk-8-jre', 'jenkins' ]
-    #$enhancers = [ 'jenkins' ]
 
     package { $enhancers:
         ensure => 'installed',
