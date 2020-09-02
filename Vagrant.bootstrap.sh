@@ -5,8 +5,8 @@ if [ ! -f "/swapdir/swapfile" ]; then
 	sudo mkdir /swapdir
 	cd /swapdir
 	sudo dd if=/dev/zero of=/swapdir/swapfile bs=1024 count=2000000
+  sudo chmod 600 /swapdir/swapfile
 	sudo mkswap -f  /swapdir/swapfile
-	sudo chmod 600 /swapdir/swapfile
 	sudo swapon swapfile
 	echo "/swapdir/swapfile       none    swap    sw      0       0" | sudo tee -a /etc/fstab /etc/fstab
 	sudo sysctl vm.swappiness=10
@@ -61,12 +61,13 @@ if [ ! -x "$(command -v puppet)" ]; then
 fi
 
 # muevo los archivos que utiliza Puppet
-sudo mv -f /tmp/site.pp $ENVIRONMENT_DIR/manifests
-sudo mv -f /tmp/init.pp $PUPPET_MODULES/docker_install/manifests/init.pp
-sudo mv -f /tmp/env $PUPPET_MODULES/docker_install/files
-sudo mv -f /tmp/init_jenkins.pp $PUPPET_MODULES/jenkins/manifests/init.pp
-sudo mv -f /tmp/jenkins_default $PUPPET_MODULES/jenkins/files/jenkins_default
-sudo mv -f /tmp/jenkins_init_d $PUPPET_MODULES/jenkins/files/jenkins_init_d
+sudo cp -f /tmp/site.pp $ENVIRONMENT_DIR/manifests
+sudo cp -f /tmp/init.pp $PUPPET_MODULES/docker_install/manifests/init.pp
+sudo cp -f /tmp/env $PUPPET_MODULES/docker_install/files
+sudo cp -f /tmp/init_jenkins.pp $PUPPET_MODULES/jenkins/manifests/init.pp
+sudo cp -f /tmp/jenkins_dependencies.pp $PUPPET_MODULES/jenkins/manifests/dependencies.pp
+sudo cp -f /tmp/jenkins_default $PUPPET_MODULES/jenkins/files/jenkins_default
+sudo cp -f /tmp/jenkins_init_d $PUPPET_MODULES/jenkins/files/jenkins_init_d
 
 #Habilito el puerto en el firewall
 sudo ufw allow 8140/tcp
@@ -76,6 +77,8 @@ echo "Reiniciando servicios puppetmaster y puppet agent"
 sudo systemctl stop puppetmaster && sudo systemctl start puppetmaster
 sudo systemctl stop puppet && sudo systemctl start puppet
 
+echo "Instalacion modulo sudo"
+sudo puppet module install saz-sudo
 
 # limpieza de configuración del dominio utn-devops.localhost es nuestro nodo agente.
 # en nuestro caso es la misma máquina
