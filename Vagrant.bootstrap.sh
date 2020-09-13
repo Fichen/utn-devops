@@ -46,6 +46,9 @@ APACHE_ROOT="/var/www"
 APP_PATH="$APACHE_ROOT/utn-devops-app/"
 
 # descargo la app del repositorio
+if [ ! -d  $APACHE_ROOT]; then
+	sudo mkdir $APACHE_ROOT
+fi
 cd $APACHE_ROOT
 sudo git clone https://github.com/Fichen/utn-devops-app.git
 cd $APP_PATH
