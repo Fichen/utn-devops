@@ -11,7 +11,7 @@ class jenkins {
     }
 
     exec { 'install_repository_key':
-        command => '/usr/bin/wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo /usr/bin/apt-key add -',
+        command => '/usr/bin/wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -',
         unless => '/usr/bin/test -n $(ps faxu |grep jenkins |grep 8082)',
         require => File['/etc/apt/sources.list.d/jenkins.list'],
     }
