@@ -190,7 +190,7 @@ Se puede comprobar la subida de la imagen base con el siguiente comando
 ```sh
  sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```
-* Enter in [Jenkins CI Server](http://ci-server.utn-devops.localhost:8082/) and paste the hash here.
+* Enter in [Jenkins CI Server](http://ci-server.utn-devops.int:8082/) and paste the hash here.
 * Clic on "Install Suggested Plugins"
 
 Create an Admin user. Fields to complete:
@@ -207,7 +207,7 @@ Email: admin@test
 - Clic on "Start using Jenkins"
 
 __Job example creation__
-- Enter in ["Create new Job"](http://ci-server.utn-devops.localhost:8082/newJob)
+- Enter in ["Create new Job"](http://ci-server.utn-devops.int:8082/newJob)
 - Complete field "Enter an item name": ie, app-test
 - Select option: "Pipeline"
 - Clic on "Ok"
@@ -226,8 +226,8 @@ __Job example creation__
 
 __Test pipeline__
 
-- Clic on ["Build now"](http://ci-server.utn-devops.localhost:8082/job/app-test/build?delay=0sec)
-- Enter into the build and clic on "console output" to verify the job. To check the first build enter [here](http://ci-server.utn-devops.localhost:8082/job/app-test/1/console)
+- Clic on ["Build now"](http://ci-server.utn-devops.int:8082/job/app-test/build?delay=0sec)
+- Enter into the build and clic on "console output" to verify the job. To check the first build enter [here](http://ci-server.utn-devops.int:8082/job/app-test/1/console)
 
 __Check deploy at develop server__
  - Enter into http://develop.utn-devops.int:8081
