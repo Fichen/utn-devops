@@ -55,13 +55,13 @@ En Linux es en /etc/hosts
 Para la edición se necesita permisos de administrador.
 
 ```sh
-10.0.0.10       puppet-master.utn-devops.localhost  puppet-master
+10.0.0.10       puppet-master.utn-devops.int  puppet-master
 10.0.0.11       develop.utn-devops.int    develop
 10.0.0.12       test.utn-devops.int   test
 10.0.0.13       ci-server.utn-devops.int  ci-server docker-registry.int
 ```
 
-Crear e iniciar las máquinas virtuales y aprovisionarlas. Este comando demora bastante.
+Crear e iniciar las máquinas virtuales y aprovisionarlas. Este comando demora bastante (crea y aprovisiona 4 VMs)
 ```sh
 vagrant up --provision
 ```
@@ -82,14 +82,15 @@ $ sudo puppet cert list --all
   "test.utn-devops.int"          (SHA256) BA:93:5A:9B:EA:03:70:2C:02:0D:BD:1B:8D:8B:73:6A:46:59:0A:82:7C:EC:84:9C:46:07:5A:72:7F:B3:3F:0E
 $ sudo puppet node clean ci-server.utn-devops.int develop.utn-devops.int test.utn-devops.int
 ```
-Se pueden verifican los certificados firmados si observa un signo "+" como prefijo del nombre de dominio. Asegurarse en este caso no debiera haber ningún dominio de los listados anteriormente
+Se pueden verifican los certificados firmados si observa un signo "+" como prefijo del nombre de dominio. Asegurarse de que no existan dominios de los listados anteriormente
 ```sh
 $ sudo puppet cert list --all
 + "puppet-master.utn-devops.int" (SHA256) 54:53:D9:8B:4C:1D:57:33:07:F0:EA:43:C5:3E:9E:21:67:3D:5C:5A:EC:69:82:9E:36:BE:1F:2E:53:57:0F:C8 (alt names: "DNS:puppet", "DNS:puppet-master", "DNS:puppet-master.utn-devops.int")
 $ exit
 ```
 
-Para comenzar a utilizar Puppet en los agentes, hay que borrar los certificados autogenerados en la instalación y realizar una petición a Master
+Para comenzar a utilizar Puppet en los agentes, hay que borrar los certificados autogenerados en la instalación y realizar una petición a Master.
+
 Esto hay que realizarlo en los servidores: ci-server, develop y test para generar los certificados SSL.
 Ejemplo para ci-server
 ```sh
@@ -99,7 +100,7 @@ $ sudo puppet agent -tv
 $ exit
 ```
 
-__Repetir esto último para develop y test__
+__Repetir lo anterior para los ambientes de develop y test__
 
 
 Luego hay que ingresar a puppet-master y firmar el certificado. En este caso es para el servidor ci-server. Primero verificamos que
@@ -118,7 +119,7 @@ Notice: Signed certificate request for ci-server.utn-devops.int
 Notice: Removing file Puppet::SSL::CertificateRequest ci-server.utn-devops.int at '/var/lib/puppet/ssl/ca/requests/ci-server.utn-devops.int.pem'
 ```
 
-Con este comando se pueden firman todos los nodos agent, sin necesidad de espeficiar el dominio.
+Con el primer comando se pueden firman todos los nodos agent, sin necesidad de espeficiar el dominio. El segundo comando es para listar el estado de los certificados
 ```sh
 $ sudo puppet cert sign --all
 $ sudo puppet cert list --all
@@ -174,8 +175,6 @@ Puesta en marcha del registry, compilación y subida de la imagen base
 ```sh
 # cd base_image
 # docker build -f Dockerfile.base -t myapp-example:latest .
-# docker run -d myapp-example
-# docker commit $(docker ps -lq) myapp-example:latest
 # docker tag myapp-example docker-registry.int:5000/myapp-example:1.0.0
 # docker login https://docker-registry.int:5000 --username admin --password admin
 # docker push docker-registry.int:5000/myapp-example:1.0.0
