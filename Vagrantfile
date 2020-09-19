@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
     # VM settings
     subconfig.vm.hostname = "puppet-master"
     subconfig.vm.provider "virtualbox" do |v|
-    v.name = "puppet-master.utn-devops.localhost"
+    v.name = "puppet-master.utn-devops.int"
     v.memory = "512"
     end
 
@@ -47,14 +47,13 @@ Vagrant.configure("2") do |config|
     # VM settings
     subconfig.vm.hostname = "develop"
     subconfig.vm.provider "virtualbox" do |v|
-    v.name = "develop.utn-devops.localhost"
+    v.name = "develop.utn-devops.int"
     v.memory = "1024"
     end
 
     # Files provisioning
     subconfig.vm.provision "file", source: "hostConfigs/puppet/puppet-agent.develop.conf", destination: "/tmp/puppet-agent.conf"
     subconfig.vm.provision "file", source: "hostConfigs/etc_hosts.txt", destination: "/tmp/hosts"
-
     subconfig.vm.provision :shell, path: "Vagrant.bootstrap.develop.sh", run: "always"
     #
   end
@@ -72,14 +71,13 @@ Vagrant.configure("2") do |config|
     #VM settings
     subconfig.vm.hostname = "test"
     subconfig.vm.provider "virtualbox" do |v|
-    v.name = "test.utn-devops.localhost"
+    v.name = "test.utn-devops.int"
     v.memory = "1024"
     end
 
     #File provisioning
     subconfig.vm.provision "file", source: "hostConfigs/puppet/puppet-agent.test.conf", destination: "/tmp/puppet-agent.conf"
     subconfig.vm.provision "file", source: "hostConfigs/etc_hosts.txt", destination: "/tmp/hosts"
-
     subconfig.vm.provision :shell, path: "Vagrant.bootstrap.test.sh", run: "always"
     #
   end
@@ -98,7 +96,7 @@ Vagrant.configure("2") do |config|
     #VM Settings
     subconfig.vm.hostname = "ci-server"
     subconfig.vm.provider "virtualbox" do |v|
-    v.name = "ci-server.utn-devops.localhost"
+    v.name = "ci-server.utn-devops.int"
     v.memory = "1024"
     end
 
@@ -108,7 +106,6 @@ Vagrant.configure("2") do |config|
     #File provisioning
     subconfig.vm.provision "file", source: "hostConfigs/puppet/puppet-agent.production.conf", destination: "/tmp/puppet-agent.conf"
     subconfig.vm.provision "file", source: "hostConfigs/etc_hosts.txt", destination: "/tmp/hosts"
-
     subconfig.vm.provision :shell, path: "Vagrant.bootstrap.ci-server.sh", run: "always"
     #
   end
