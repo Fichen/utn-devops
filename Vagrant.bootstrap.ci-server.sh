@@ -5,7 +5,7 @@ if [ ! -f "/swapdir/swapfile" ]; then
 	sudo mkdir /swapdir
 	cd /swapdir
 	sudo dd if=/dev/zero of=/swapdir/swapfile bs=1024 count=2000000
-	sudo chmod 600 /swapdir/swapfile
+	sudo chmod 0600 /swapdir/swapfile
 	sudo mkswap -f  /swapdir/swapfile
 	sudo swapon swapfile
 	echo "/swapdir/swapfile       none    swap    sw      0       0" | sudo tee -a /etc/fstab /etc/fstab
