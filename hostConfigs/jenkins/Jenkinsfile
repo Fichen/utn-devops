@@ -6,7 +6,7 @@ pipeline {
             steps {
                 sh 'git clone https://github.com/Fichen/utn-devops-app.git || true'
                 sh 'cd utn-devops-app && sudo git checkout unidad-2'
-                sh 'cd utn-devops-app/myapp && sudo /usr/local/bin/composer install'
+                sh 'cd utn-devops-app/myapp && sudo /usr/local/bin/composer install --no-scripts'
                 sh 'chmod 777 ./utn-devops-app/myapp/bootstrap/cache/'
             }
         }
