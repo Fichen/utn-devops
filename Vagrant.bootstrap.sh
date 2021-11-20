@@ -6,7 +6,7 @@
 sudo apt-get update
 
 # Instalo un servidor web
-sudo apt-get install -y apache2 
+sudo apt-get install -y apache2
 
 ### Configuración del entorno ###
 
@@ -23,12 +23,6 @@ if [ ! -f "/swapdir/swapfile" ]; then
 	echo vm.swappiness = 10 | sudo tee -a /etc/sysctl.conf
 fi
 
-# ruta raíz del servidor web
-APACHE_ROOT="/var/www"
-# ruta de la aplicación
-APP_PATH="$APACHE_ROOT/utn-devops-app"
-
-
 ## configuración servidor web
 #copio el archivo de configuración del repositorio en la configuración del servidor web
 if [ -f "/tmp/devops.site.conf" ]; then
@@ -41,11 +35,17 @@ if [ -f "/tmp/devops.site.conf" ]; then
 	#refresco el servicio del servidor web para que tome la nueva configuración
 	sudo service apache2 reload
 fi
-	
+
 ## aplicación
+
+# ruta raíz del servidor web
+APACHE_ROOT="/var/www"
+# ruta de la aplicación
+APP_PATH="$APACHE_ROOT/utn-devops-app"
 
 # descargo la app del repositorio
 if [ ! -d "$APP_PATH" ]; then
+	sudo mkdir /var/www
 	echo "clono el repositorio"
 	cd $APACHE_ROOT
 	sudo git clone https://github.com/Fichen/utn-devops-app.git
