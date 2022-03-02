@@ -6,7 +6,7 @@ Vagrant.configure("2") do |config|
   # Con esto le indicamos a Vagrant ue vaya al directorio de "cajas" (boxes) que contiene su Atlas e instale un
   # Ubuntu 64 bits mediante el gestor de maquinas virtuales VirtualBox
   # El directorio completo de boxes se puede ver en la siguiente URL atlas.hashicorp.com/boxes/search
-  config.vm.box = "ubuntu/bionic64"
+  config.vm.box = "hashicorp/bionic64"
 
   # Con la siguiente configuración se redireccionan los puertos desde la maquina virtual a la maquina real.
   # A diferencia de lo que observamos en la unidad n°1, ahora el servicio que utiliza el puerto en realidad
