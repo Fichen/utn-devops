@@ -37,7 +37,7 @@ class jenkins {
     } -> exec { 'reload': # Notifico al gestor de servicios que un archivo cambio
         command => '/bin/systemctl restart jenkins',
         path    => '/usr/bin:/usr/sbin:/bin',
-        unless  => 'netstat -pant |grep LISTEN |grep 80182 | awk  \'{print $7}\'',
+        unless  => 'netstat -pant |grep LISTEN |grep 8082 | awk  \'{print $7}\'',
     }
 
     service { 'jenkins':
