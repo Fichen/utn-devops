@@ -61,13 +61,24 @@ if [ ! -x "$(command -v puppet)" ]; then
 fi
 
 # muevo los archivos que utiliza Puppet
-sudo cp -f /tmp/site.pp $ENVIRONMENT_DIR/manifests
-sudo cp -f /tmp/init.pp $PUPPET_MODULES/docker_install/manifests/init.pp
-sudo cp -f /tmp/env $PUPPET_MODULES/docker_install/files
-sudo cp -f /tmp/init_jenkins.pp $PUPPET_MODULES/jenkins/manifests/init.pp
-sudo cp -f /tmp/jenkins_dependencies.pp $PUPPET_MODULES/jenkins/manifests/dependencies.pp
-sudo cp -f /tmp/jenkins_default $PUPPET_MODULES/jenkins/files/jenkins_default
-sudo cp -f /tmp/jenkins_init_d $PUPPET_MODULES/jenkins/files/jenkins_init_d
+if [ -f "/tmp/site.pp" ]; then
+  sudo cp -f /tmp/site.pp $ENVIRONMENT_DIR/manifests
+fi
+
+if [ -f "/tmp/init.pp" ]; then
+  sudo cp -f /tmp/init.pp $PUPPET_MODULES/docker_install/manifests/init.pp
+fi
+
+if [ -f "/tmp/env" ]; then
+  sudo cp -f /tmp/env $PUPPET_MODULES/docker_install/files
+fi
+if [ -f "/tmp/init_jenkins.pp" ]; then
+  sudo cp -f /tmp/init_jenkins.pp $PUPPET_MODULES/jenkins/manifests/init.pp
+fi
+if [ -f "/tmp/jenkins_dependencies.pp" ]; then
+  sudo cp -f /tmp/jenkins_dependencies.pp $PUPPET_MODULES/jenkins/manifests/dependencies.pp
+fi
+
 
 #Habilito el puerto en el firewall
 sudo ufw allow 8140/tcp
