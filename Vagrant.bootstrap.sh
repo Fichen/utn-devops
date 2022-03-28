@@ -18,15 +18,12 @@ if [ -f "/tmp/etc_hosts.txt" ]; then
 fi
 
 ###### Instalación de Puppet ######
-#configuración de repositorio
+#Directorios
+PUPPET_DIR="/etc/puppet"
+ENVIRONMENT_DIR="${PUPPET_DIR}/code/environments/production"
+PUPPET_MODULES="${ENVIRONMENT_DIR}/modules"
 if [ ! -x "$(command -v puppet)" ]; then
-
-	#### Instalacion puppet master
-  #Directorios
-  PUPPET_DIR="/etc/puppet"
-  ENVIRONMENT_DIR="${PUPPET_DIR}/code/environments/production"
-  PUPPET_MODULES="${ENVIRONMENT_DIR}/modules"
-
+  #configuración de repositorio
 	sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
  	sudo apt-get update
 	sudo apt install -y puppetmaster
@@ -63,12 +60,10 @@ if [ ! -x "$(command -v puppet)" ]; then
   sudo mv -f /tmp/init.pp $PUPPET_MODULES/docker_install/manifests/init.pp
   sudo mv -f /tmp/env $PUPPET_MODULES/docker_install/files
   sudo mv -f /tmp/init_jenkins.pp $PUPPET_MODULES/jenkins/manifests/init.pp
-  sudo mv -f /tmp/jenkins_default $PUPPET_MODULES/jenkins/files/jenkins_default
-  sudo mv -f /tmp/jenkins_init_d $PUPPET_MODULES/jenkins/files/jenkins_init_d
-
   sudo cp /usr/share/doc/puppet/examples/etckeeper-integration/*commit* $PUPPET_DIR
   sudo chmod 755 $PUPPET_DIR/etckeeper-commit-p*
 fi
+
 
 sudo ufw allow 8140/tcp
 

@@ -28,19 +28,14 @@ class jenkins {
     } ->
     #Reemplazo el puerto de jenkins para que este escuchando en el 8082
     exec { 'replace_jenkins_port':
-        command => "/bin/sed -i -- 's/HTTP_PORT=8080/HTTP_PORT=8082/g' /etc/default/jenkins",
-        notify => Service['jenkins'],
-    }
-
-    # Notifico al gestor de servicios que un archivo cambio
-    exec { 'reload-systemctl':
+        command => "/bin/sed -i -- 's/JENKINS_PORT=8080/JENKINS_PORT=8082/g' /lib/systemd/system/jenkins.service",
+    } -> exec { 'reload-systemctl':
         command => '/bin/systemctl daemon-reload',
+        notify  => Service['jenkins'],
     }
 
     # aseguro que el servicio de jenkins este activo
     service { 'jenkins':
         ensure  => running,
-        enable  => "true",
-        require => Exec['reload-systemctl']
     }
 }
