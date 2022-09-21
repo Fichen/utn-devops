@@ -14,8 +14,10 @@ Los atributos de un jugador son los siguientes:
  - nodejs: >=14
  - npm: >= 8.14
 
-### Instalación
+### Instalación y ejecución
 ```
 npm install
 npm run dev
 ```
+
+Abrir la url http://localhost:3000/players para visualizar el resultado
