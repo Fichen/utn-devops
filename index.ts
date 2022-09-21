@@ -1,16 +1,17 @@
-import express from "express";
-import { Player } from "./player";
+import express from 'express';
+import { PlayerService } from './services/playerService';
+import { PlayerRepository } from './repositories/playerRepository';
 
 const app = express();
 const PORT = 3000;
 
-const players = [
-  new Player(1, "Lionel", "Messi", 551502000000).toJson(),
-  new Player(2, "Ángel", "Di María", 571806000000).toJson(),
-];
-
-app.get("/players", (_, res) => {
-  res.json(players);
+app.get('/players', async (_, res) => {
+  try {
+    const service = new PlayerService();
+    res.json(await service.getAll());
+  } catch (error) {
+    res.json(error);
+  }
 });
 
 app.listen(PORT, () => {
