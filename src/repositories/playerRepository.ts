@@ -1,5 +1,5 @@
+import { Player } from '../domain/player';
 import { sqlClient } from './dbClient';
-import { Player } from '../player';
 
 export class PlayerRepository {
   public async getAll(): Promise<Player[]> {

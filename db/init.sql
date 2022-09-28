@@ -16,5 +16,5 @@ SET
 insert into
   players (firstName, lastName, birthday)
 values
-  ('Lionel', 'Messi', 5515020000000),
+  ('Lionel', 'Messi', 551502000000),
   ('Angel', 'Di Maria', 571806000000);

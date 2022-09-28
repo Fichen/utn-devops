@@ -1,4 +1,4 @@
-import { Player } from '../player';
+import { Player } from '../domain/player';
 
 describe('Players', () => {
   test('should display a birthday date with format dd/mm/yyyy when a timestamp is given', () => {

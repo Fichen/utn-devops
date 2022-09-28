@@ -1,6 +1,5 @@
 import express from 'express';
 import { PlayerService } from './services/playerService';
-import { PlayerRepository } from './repositories/playerRepository';
 
 const app = express();
 const PORT = 3000;
