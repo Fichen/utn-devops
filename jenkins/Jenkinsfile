@@ -15,6 +15,7 @@ pipeline {
                 script {
                     COMMIT_ID = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
                     BRANCH = sh(returnStdout: true, script: "git name-rev ${COMMIT_ID} --name-only").trim()
+                    sh 'npm install'
                 }
             }
         }
@@ -32,24 +33,12 @@ pipeline {
                 }
             }
         }
-        stage('Deploy to Develop') {
-            when { branch "${DEFAULT_BRANCH}" }
-            steps {
-                echo 'Deploying to Develop'
-                script {
-                    echo "branch $DEFAULT_BRANCH"
-                    echo "COMMIT $COMMIT_ID"
-                    echo "sh script/deploy_script"
-                    echo 'Deployment to develop end'
-                }
-            }
-        }
         stage('Deploy to Stage') {
-            when { branch 'RC-*' }
+            when { tag 'v*' }
             steps {
                 echo "Deploying to stage, branch ${BRANCH_NAME}"
                 script {
-                    echo "branch $DEFAULT_BRANCH"
+                    echo "branch $BRANCH"
                     echo "COMMIT $COMMIT_ID"
                     echo "sh script/deploy_script stage"
                     echo 'Deployment to stage end'
