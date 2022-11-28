@@ -3,13 +3,13 @@ class jenkins {
 
     # get key
     exec { 'install_jenkins_key':
-        command => '/usr/bin/wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -',
+        command => '/usr/bin/curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null',
     }
 
     # source file
     file { '/etc/apt/sources.list.d/jenkins.list':
         ensure  => present,
-        content => "deb https://pkg.jenkins.io/debian-stable binary/\n",
+        content => "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/\n",
         mode    => '0644',
         owner   => root,
         group   => root,
@@ -22,7 +22,7 @@ class jenkins {
     }
 
     #install jenkins
-    $enhancers = [ 'openjdk-8-jre', 'jenkins' ]
+    $enhancers = [ 'openjdk-11-jre', 'jenkins' ]
 
     # jenkins package
     package { $enhancers:
