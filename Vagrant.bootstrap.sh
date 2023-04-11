@@ -83,6 +83,8 @@ fi
 #Habilito el puerto en el firewall
 sudo ufw allow 8140/tcp
 
+sudo apt install ca-certificates && sudo apt-get update
+
 # al detener e iniciar el servicio se regeneran los certificados
 echo "Reiniciando servicios puppetmaster y puppet agent"
 sudo systemctl stop puppetmaster && sudo systemctl start puppetmaster
