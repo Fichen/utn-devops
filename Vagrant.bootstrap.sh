@@ -26,7 +26,7 @@ if [ ! -x "$(command -v puppet)" ]; then
   #configuración de repositorio
 	sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
  	sudo apt-get update
-	sudo apt install -y puppetmaster
+	sudo apt install -y puppet-master
 
 	#### Instalacion puppet agent
 	sudo apt install -y puppet

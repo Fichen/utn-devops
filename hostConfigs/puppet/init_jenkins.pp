@@ -1,8 +1,9 @@
+#
 class jenkins {
 
     # get key
     exec { 'install_jenkins_key':
-        command => '/usr/bin/curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null',
+        command => '/usr/bin/curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null',
     }
 
         # source file
