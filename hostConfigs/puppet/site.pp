@@ -29,8 +29,8 @@ node 'utn-devops.localhost' {
     # La variable $::operatingsystem se obtiene de los "facts" que envían los agentes y representa el
     # el sistema operativo del nodo.
     case $::operatingsystem {
-        'Debian', 'Ubuntu' : { 
-            include jenkins 
+        'Debian', 'Ubuntu' : {
+            include jenkins
             include jenkins::dependencies
         }
         default  : { notify {"$::operatingsystem no esta soportado":} }

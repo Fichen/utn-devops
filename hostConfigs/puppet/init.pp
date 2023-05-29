@@ -1,43 +1,41 @@
-class docker_install {
 ## Este archivo corresponde al módulo de configuración de puppet, el cual define
 # una clase con ciertas especificaciones para instalación y aprovisionamiento. Si bien
 # esta nombrado como docker install (instalación de docker) tiene una
 # responsabilidad más amplia que es instalar algunos paquetes útiles para
 # la aplicación así como también un archivo de configuración. Lo recomendando
 # es que lo que es propio de la aplicación sea un módulo distinto.
-
+class docker_install {
 
 # Agrego el repositorio para la instalación de Docker
 exec { 'agrego-repositorio':
-  command => '/usr/bin/add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -'
-} ->
-# Actualización de repositorio. La declaracion de un bloque exec permite definir
-# comandos que ejecutara el nodo cliente de Puppet
-exec { 'apt-update':
-  command => '/usr/bin/apt-get update'
+  command => 'install -m 0755 -d /etc/apt/keyrings | curl -fsSL https://download.docker.com/linux/ubuntu/gpg  
+  | gpg --dearmor -o /etc/apt/keyrings/docker.gpg 
+  |	chmod a+r /etc/apt/keyrings/docker.gpg
+  | echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  tee /etc/apt/sources.list.d/docker.list > /dev/null',
+  path    => '/usr/bin',
+} -> exec { 'apt-update':# Actualización de repositorio. 
+  command => '/usr/bin/apt-get update',
 }
 
 # Instalación del paquete docker. Tambien es para ejemplicar que se puede declarar
 # como requisito que se ejecuten una serie de comandos antes de la instalación
-package { 'docker-ce':
-  require => Exec['apt-update','agrego-repositorio','apt-update'],
-  ensure => installed,
+$packages = ['docker-ce', 'docker-ce-cli', 'containerd.io', 'docker-buildx-plugin', 'docker-compose-plugin', 'docker-compose']
+package { $packages:
+  ensure  => installed,
+  require => Exec['agrego-repositorio','apt-update'],
 }
 
-# Instalación del paquete docker-compose
-package { 'docker-compose':
-  require => Exec['apt-update'],
-  ensure => installed,
-}
 
 # Aprovisionamiento de configuración para la aplicación. Con esta declaracion
 # se transfiere un archivo del servidor Puppet Master al nodo que contiene el agente
-file { "/var/www/utn-devops-app/myapp/.env":
-  mode => "0644",
-    owner => 'root',
-    group => 'root',
+file { '/var/www/utn-devops-app/myapp/.env':
   ensure => 'present',
-    source => 'puppet:///modules/docker_install/env',
+  mode   => '0644',
+  owner  => 'root',
+  group  => 'root',
+  source => 'puppet:///modules/docker_install/env'
 }
 
 # asegurar que el servicio docker se este ejecutando
@@ -47,9 +45,8 @@ service { 'docker':
 
 exec { 'config-app':
   command => 'docker-compose -f /vagrant/docker/docker-compose.yml up -d',
-  path => '/usr/bin',
-  onlyif => 'test $(docker ps |grep apache)',
+  path    => '/usr/bin',
+  onlyif  => 'test $(docker ps |grep apache)',
 }
-
 
 }

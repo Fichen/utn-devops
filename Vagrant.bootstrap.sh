@@ -12,6 +12,7 @@ if [ ! -f "/swapdir/swapfile" ]; then
 	sudo sysctl vm.swappiness=10
 	echo vm.swappiness = 10 | sudo tee -a /etc/sysctl.conf
 fi
+ 
 
 ###### Puppet ######
 #Directorios
@@ -26,7 +27,7 @@ if [ ! -x "$(command -v puppet)" ]; then
 
 	sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
  	sudo apt-get update
-	sudo apt install -y puppetmaster
+	sudo apt install -y puppet-master
 
 	#### Instalacion puppet agent
 	sudo apt install -y puppet

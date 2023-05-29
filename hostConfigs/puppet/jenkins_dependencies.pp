@@ -3,12 +3,35 @@
 class jenkins::dependencies {
 
 
-    #Los paquetes de PHP se encuentran listados en la variable $enhancers.
-    $enhancers = [ 'php7.3', 'php7.3-xdebug', 'php7.3-xsl', 'php7.3-dom', 'php7.3-zip', 'php7.3-mbstring','phpunit', 'php-codesniffer', 'phploc','pdepend','phpmd','phpcpd','phpdox','ant','php7.2-xml','php7.3-xml']
+    #listado de dependencias
+    $enhancers = [
+        'libmcrypt-dev',
+        'mariadb-client',
+        'libmagickwand-dev',
+        'zip',
+        'zlib1g-dev',
+        'libzip-dev',
+        'libonig-dev',
+        'php7.4',
+        'php7.4-xdebug',
+        'php7.4-xsl',
+        'php7.4-dom',
+        'php7.4-zip',
+        'php7.4-mbstring',
+        'phpunit',
+        'php-codesniffer',
+        'phploc',
+        'pdepend',
+        'phpmd',
+        'phpcpd',
+        'phpdox',
+        'ant',
+        'php7.4-xml',
+        ]
 
     # Generación de un archivo que contiene un repositorio para la instalación de paquetes de PHP # update
-    file { '/etc/apt/sources.list.d/ondrej-ubuntu-php-bionic.list':
-        content => "deb http://ppa.launchpad.net/ondrej/php/ubuntu bionic main\n",
+    file { '/etc/apt/sources.list.d/ondrej-ubuntu-php-jammy.list':
+        content => "deb http://ppa.launchpad.net/ondrej/php/ubuntu jammy main\n",
         mode    => '0644',
         owner   => root,
         group   => root,
