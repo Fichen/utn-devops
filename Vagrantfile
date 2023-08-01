@@ -16,8 +16,10 @@ Vagrant.configure("2") do |config|
   box = 'ubuntu/jammy64'
   
   #Si se ejecuta sobre arquitectura ARM (chipset M1), se configura otra imagen
-  if is_arm64()
+  if is_arm64() and Vagrant::Util::Platform.darwin? 
     box = "bento/ubuntu-22.04-arm64"
+  else
+    config.vm.provision "shell", inline: "sudo apt-get update && sudo apt-get install -y virtualbox-guest-x11"
   end
 
   # Con esto le indicamos a Vagrant que vaya al directorio de "cajas" (boxes) que contiene su Atlas e instale un
@@ -40,8 +42,11 @@ Vagrant.configure("2") do |config|
   # configuración del nombre de maquina
   config.vm.hostname = "utn-devops.localhost"
   config.vm.boot_timeout = 3600
+
+  #Configuro la cantidad de memoria ram de la VM para el proveedor VirtualBox
   config.vm.provider "virtualbox" do |v|
 	  v.name = "utn-devops-vagrant-ubuntu"
+    v.memory = "1024"
   end
 
   # Mapeo de directorios que se comparten entre la maquina virtual y nuestro equipo. En este caso es
@@ -49,9 +54,9 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder ".", "/vagrant"
 
 
-  #Configuro la cantidad de memoria ram de la VM
-  config.vm.provider "virtualbox" do |vb|
-    vb.memory = "1024"
+  #Configuro la cantidad de memoria ram de la VM para el proveedor VMware
+  config.vm.provider "vmware_desktop" do |vm|
+    vm.memory = "1024"
   end
 
 

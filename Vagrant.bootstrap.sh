@@ -15,6 +15,7 @@ if [ ! -f "/swapdir/swapfile" ]; then
 	sudo mkdir /swapdir
 	cd /swapdir
 	sudo dd if=/dev/zero of=/swapdir/swapfile bs=1024 count=2000000
+	sudo chmod 0600 /swapdir/swapfile
 	sudo mkswap -f  /swapdir/swapfile
 	sudo chmod 600 /swapdir/swapfile
 	sudo swapon swapfile
@@ -43,9 +44,12 @@ APACHE_ROOT="/var/www"
 # ruta de la aplicación
 APP_PATH="$APACHE_ROOT/utn-devops-app"
 
+if [ ! -d "$APACHE_ROOT" ]; then
+	sudo mkdir $APACHE_ROOT
+fi
+
 # descargo la app del repositorio
 if [ ! -d "$APP_PATH" ]; then
-	sudo mkdir /var/www
 	echo "clono el repositorio"
 	cd $APACHE_ROOT
 	sudo git clone https://github.com/Fichen/utn-devops-app.git
