@@ -61,9 +61,8 @@ Vagrant.configure("2") do |config|
   end
 
 
-  # Copia el archivo de configuración del servidor web. Este comando transfiere un archivo desde la maquina host
-  # a la maquina cliente
-  config.vm.provision "file", source: "Configs/devops.site.conf", destination: "/tmp/devops.site.conf"
+  # Este comando transfiere un archivo desde la maquina host a la maquina cliente
+  config.vm.provision "file", source: "hostConfigs/ufw", destination: "/tmp/ufw"
 
   # En este archivo tendremos el provisionamiento de software necesario para nuestra
   # maquina virtual. Por ejemplo, servidor web, servidor de base de datos, etc.
