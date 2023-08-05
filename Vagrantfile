@@ -1,11 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-#https://github.com/hashicorp/vagrant/issues/12610#issuecomment-1117967936
-def is_arm64()
-  `uname -m` == "arm64" || `/usr/bin/arch -64 sh -c "sysctl -in sysctl.proc_translated"`.strip() == "0"
-end
-
 Vagrant.configure("2") do |config|
 
   if Vagrant.has_plugin?("vagrant-vbguest") then
@@ -15,8 +10,8 @@ Vagrant.configure("2") do |config|
   #Imagen por defecto
   box = 'ubuntu/jammy64'
   
-  #Si se ejecuta sobre arquitectura ARM (chipset M1), se configura otra imagen
-  if is_arm64() and Vagrant::Util::Platform.darwin? 
+  #Si se ejecuta sobre macOS se configura otra imagen
+  if Vagrant::Util::Platform.darwin? 
     box = "bento/ubuntu-22.04-arm64"
   else
     config.vm.provision "shell", inline: "sudo apt-get update && sudo apt-get install -y virtualbox-guest-x11"
@@ -33,8 +28,8 @@ Vagrant.configure("2") do |config|
   # Esto se realiza para poder darle visibilidad a los puertos de la maquina virtual
   # y además para que no se solapen los puertos con los de nuestra equipo en el caso de que
   # ese número de puerto este en uso.
-  config.vm.network "forwarded_port", guest: 80, host: 8081
-  config.vm.network "forwarded_port", guest: 4400, host: 4400
+  config.vm.network "forwarded_port", guest: 8081, host: 8081, auto_correct: true
+  config.vm.network "forwarded_port", guest: 4400, host: 4400, auto_correct: true
 
   #Permite descargas con certificados vencidos o por http
   config.vm.box_download_insecure = true
@@ -61,7 +56,8 @@ Vagrant.configure("2") do |config|
   end
 
 
-  # Este comando transfiere un archivo desde la maquina host a la maquina cliente
+  # Este comando transfiere un archivo desde la maquina host a la maquina cliente. 
+  # Es para permitir el redireccionamiento de tráfico entre el máquina host y la vm
   config.vm.provision "file", source: "hostConfigs/ufw", destination: "/tmp/ufw"
 
   # En este archivo tendremos el provisionamiento de software necesario para nuestra

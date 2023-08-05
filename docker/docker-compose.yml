@@ -13,8 +13,10 @@ services:
       - "8081:80" 
     depends_on:
       - db_server
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   db_server:
-    image: mysql:5.7
+    image: mysql/mysql-server:8.0.23
     container_name: mysql
     environment:
       - MYSQL_DATABASE=devops_app #creará una base de datos con ese nombre
