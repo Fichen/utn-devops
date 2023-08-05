@@ -37,14 +37,13 @@ if [ -f "/tmp/devops.site.conf" ]; then
 fi
 
 ## aplicación
-
 # ruta raíz del servidor web
 APACHE_ROOT="/var/www"
 # ruta de la aplicación
 APP_PATH="$APACHE_ROOT/utn-devops-app"
 
 if [ ! -d "$APACHE_ROOT" ]; then
-	sudo mkdir $APACHE_ROOT
+	sudo mkdir -p $APACHE_ROOT
 fi
 
 # descargo la app del repositorio
