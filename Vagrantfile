@@ -1,11 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-#https://github.com/hashicorp/vagrant/issues/12610#issuecomment-1117967936
-def is_arm64()
-  `uname -m` == "arm64" || `/usr/bin/arch -64 sh -c "sysctl -in sysctl.proc_translated"`.strip() == "0"
-end
-
 Vagrant.configure("2") do |config|
 
   if Vagrant.has_plugin?("vagrant-vbguest") then
@@ -15,8 +10,8 @@ Vagrant.configure("2") do |config|
   #Imagen por defecto
   box = 'ubuntu/jammy64'
   
-  #Si se ejecuta sobre arquitectura ARM (chipset M1), se configura otra imagen
-  if is_arm64() and Vagrant::Util::Platform.darwin? 
+  #Si se ejecuta sobre macOS se configura otra imagen
+  if Vagrant::Util::Platform.darwin? 
     box = "bento/ubuntu-22.04-arm64"
   else
     config.vm.provision "shell", inline: "sudo apt-get update && sudo apt-get install -y virtualbox-guest-x11"
