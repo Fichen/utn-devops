@@ -1,4 +1,4 @@
-version: '2'
+version: '3.8'
 services:
   php:
     container_name: apache2_php
@@ -24,5 +24,7 @@ services:
     ports:
       - "4400:3306"
     volumes:
-      - /var/db/mysql:/var/lib/mysql
+      - db_data:/var/lib/mysql
       - "./configs/mysql/script.sql:/tmp/script.sql"
+volumes:
+  db_data:
