@@ -24,7 +24,8 @@ ENVIRONMENT_DIR="${PUPPET_DIR}/code/environments/production"
 PUPPET_MODULES="${ENVIRONMENT_DIR}/modules"
 if [ ! -x "$(command -v puppet)" ]; then
   #configuración de repositorio
-	sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
+  sudo add-apt-repository universe -y
+  sudo add-apt-repository multiverse -y
  	sudo apt-get update
 	sudo apt install -y puppet-master
 
@@ -35,7 +36,7 @@ if [ ! -x "$(command -v puppet)" ]; then
   # entre master y agents
 	sudo timedatectl set-timezone America/Argentina/Buenos_Aires
 	sudo apt-get -y install ntp
-	sudo systemctl restart ntp
+	sudo apt-get -y install ntp
 
   # Muevo el archivo de configuración de Puppet al lugar correspondiente
   sudo mv -f /tmp/puppet-master.conf $PUPPET_DIR/puppet.conf
