@@ -26,17 +26,16 @@ if [ ! -x "$(command -v puppet)" ]; then
   #configuración de repositorio
   sudo add-apt-repository universe -y
   sudo add-apt-repository multiverse -y
- 	sudo apt-get update
-	sudo apt install -y puppet-master
-
-	#### Instalacion puppet agent
-	sudo apt install -y puppet
+  sudo apt-get update
+  sudo apt install -y puppet-master
+  
+  #### Instalacion puppet agent
+  sudo apt install -y puppet
 
   # Esto es necesario en entornos reales para posibilitar la sincronizacion
   # entre master y agents
-	sudo timedatectl set-timezone America/Argentina/Buenos_Aires
-	sudo apt-get -y install ntp
-	sudo apt-get -y install ntp
+  sudo timedatectl set-timezone America/Argentina/Buenos_Aires
+  sudo apt-get -y install ntp
 
   # Muevo el archivo de configuración de Puppet al lugar correspondiente
   sudo mv -f /tmp/puppet-master.conf $PUPPET_DIR/puppet.conf
