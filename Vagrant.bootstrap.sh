@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#Actualizo los paquetes de la maquina virtual
+sudo apt-get update -y
+
+#Aprovisionamiento de software
+sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common linux-image-extra-virtual-hwe-$(lsb_release -r |awk  '{ print $2 }') linux-image-extra-virtual
+
 ##Genero una partición swap. Previene errores de falta de memoria
 if [ ! -f "/swapdir/swapfile" ]; then
 	sudo mkdir /swapdir
@@ -19,24 +25,20 @@ fi
 PUPPET_DIR="/etc/puppet"
 ENVIRONMENT_DIR="${PUPPET_DIR}/code/environments/production"
 PUPPET_MODULES="${ENVIRONMENT_DIR}/modules"
-
 if [ ! -x "$(command -v puppet)" ]; then
-
-	#### Instalacion puppet master
-  #Directorios
-
-	sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
- 	sudo apt-get update
-	sudo apt install -y puppet-master
-
-	#### Instalacion puppet agent
-	sudo apt install -y puppet
+  #configuración de repositorio
+  sudo add-apt-repository universe -y
+  sudo add-apt-repository multiverse -y
+  sudo apt-get update
+  sudo apt install -y puppet-master
+  
+  #### Instalacion puppet agent
+  sudo apt install -y puppet
 
   # Esto es necesario en entornos reales para posibilitar la sincronizacion
   # entre master y agents
-	sudo timedatectl set-timezone America/Argentina/Buenos_Aires
-	sudo apt-get -y install ntp
-	sudo systemctl restart ntp
+  sudo timedatectl set-timezone America/Argentina/Buenos_Aires
+  sudo apt-get -y install ntp
 
   # Muevo el archivo de configuración de Puppet al lugar correspondiente
   sudo mv -f /tmp/puppet-master.conf $PUPPET_DIR/puppet.conf
@@ -51,7 +53,9 @@ if [ ! -x "$(command -v puppet)" ]; then
 
   # Estructura de directorios para crear el entorno de Puppet
   sudo mkdir -p $ENVIRONMENT_DIR/{manifests,modules,hieradata}
-  sudo mkdir -p $PUPPET_MODULES/docker_install/{manifests,files}
+
+  # Estructura de directorios para crear el modulo de Jenkins
+  sudo mkdir -p $PUPPET_MODULES/jenkins/{manifests,files}
 
   # Estructura de directorios para crear el modulo de Jenkins
   sudo mkdir -p $PUPPET_MODULES/jenkins/{manifests,files}
@@ -70,9 +74,6 @@ if [ -f "/tmp/init.pp" ]; then
   sudo cp -f /tmp/init.pp $PUPPET_MODULES/docker_install/manifests/init.pp
 fi
 
-if [ -f "/tmp/env" ]; then
-  sudo cp -f /tmp/env $PUPPET_MODULES/docker_install/files
-fi
 if [ -f "/tmp/init_jenkins.pp" ]; then
   sudo cp -f /tmp/init_jenkins.pp $PUPPET_MODULES/jenkins/manifests/init.pp
 fi
@@ -90,9 +91,6 @@ sudo apt install ca-certificates && sudo apt-get update
 echo "Reiniciando servicios puppetmaster y puppet agent"
 sudo systemctl stop puppetmaster && sudo systemctl start puppetmaster
 sudo systemctl stop puppet && sudo systemctl start puppet
-
-echo "Instalacion modulo sudo"
-sudo puppet module install saz-sudo
 
 # limpieza de configuración del dominio utn-devops.localhost es nuestro nodo agente.
 # en nuestro caso es la misma máquina

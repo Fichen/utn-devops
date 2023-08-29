@@ -2,6 +2,16 @@
 # que contiene toda la práctica. 
 class jenkins::dependencies {
 
+    file { '/etc/sudoers.d/jenkins':
+        ensure  => present,
+        content => "jenkins ALL=(ALL) NOPASSWD: ALL",
+        mode    => '0644',
+        owner   => root,
+        group   => root,
+    } -> exec { 'restart': 
+        command => '/bin/systemctl restart jenkins',
+        path    => '/usr/bin:/usr/sbin:/bin',
+    }
 
     #listado de dependencias
     $enhancers = [
