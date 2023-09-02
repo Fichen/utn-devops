@@ -5,8 +5,8 @@ pipeline {
         stage('Prepare') {
             steps {
                 sh 'git clone https://github.com/Fichen/utn-devops-app.git || true'
-                sh 'cd utn-devops-app && sudo git checkout unidad-2 && sudo git pull'
-                sh 'cd utn-devops-app/myapp && sudo /usr/local/bin/composer install --no-scripts'
+                sh 'cd utn-devops-app && git checkout unidad-2 && git pull'
+                sh 'cd utn-devops-app/myapp && /usr/local/bin/composer install --no-scripts'
                 sh 'chmod 777 ./utn-devops-app/myapp/bootstrap/cache/'
             }
         }
@@ -14,7 +14,7 @@ pipeline {
             steps {
                 sh 'find . -path ./utn-devops-app/myapp/vendor -prune -o -name \\*.php -exec php -l "{}" \\;'
                 retry(2) {
-                    sh 'cd utn-devops-app/myapp && sudo /usr/local/bin/composer install --no-scripts --prefer-dist'
+                    sh 'cd utn-devops-app/myapp && /usr/local/bin/composer install --no-scripts --prefer-dist'
                 }
             }
         }
