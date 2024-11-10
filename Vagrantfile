@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
   box = 'ubuntu/jammy64'
   
   #Si se ejecuta sobre macOS se configura otra imagen
-  if Vagrant::Util::Platform.darwin? 
+  if Vagrant::Util::Platform::architecture == 'arm64' 
     box = "bento/ubuntu-22.04-arm64"
   else
     config.vm.provision "shell", inline: "sudo apt-get update && sudo apt-get install -y virtualbox-guest-x11"
