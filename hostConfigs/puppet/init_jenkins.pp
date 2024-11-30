@@ -22,7 +22,7 @@ class jenkins {
     }
 
     #install jenkins
-    $enhancers = [ 'openjdk-11-jre', 'jenkins' ]
+    $enhancers = [ 'openjdk-17-jre', 'jenkins' ]
 
     # jenkins package
     package { $enhancers:
