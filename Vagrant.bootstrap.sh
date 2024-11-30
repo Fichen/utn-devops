@@ -55,13 +55,22 @@ if [ ! -x "$(command -v puppet)" ]; then
   # Estructura de directorios para crear el modulo de Jenkins
   sudo mkdir -p $PUPPET_MODULES/jenkins/{manifests,files}
 
-  # muevo los archivos que utiliza Puppet
-  sudo mv -f /tmp/site.pp $ENVIRONMENT_DIR/manifests #/etc/puppet/manifests/
-  sudo mv -f /tmp/init.pp $PUPPET_MODULES/docker_install/manifests/init.pp
-  sudo mv -f /tmp/env $PUPPET_MODULES/docker_install/files
-  sudo mv -f /tmp/init_jenkins.pp $PUPPET_MODULES/jenkins/manifests/init.pp
   sudo cp /usr/share/doc/puppet/examples/etckeeper-integration/*commit* $PUPPET_DIR
   sudo chmod 755 $PUPPET_DIR/etckeeper-commit-p*
+fi
+
+# muevo los archivos que utiliza Puppet
+if [ -f "/tmp/site.pp" ]; then
+  sudo mv -f /tmp/site.pp $ENVIRONMENT_DIR/manifests #/etc/puppet/manifests/
+fi
+if [ -f "/tmp/init.pp" ]; then
+  sudo mv -f /tmp/init.pp $PUPPET_MODULES/docker_install/manifests/init.pp
+fi
+if [ -f "/tmp/env" ]; then
+  sudo mv -f /tmp/env $PUPPET_MODULES/docker_install/files
+fi
+if [ -f "/tmp/init_jenkins.pp" ]; then
+  sudo mv -f /tmp/init_jenkins.pp $PUPPET_MODULES/jenkins/manifests/init.pp
 fi
 
 
