@@ -3,25 +3,21 @@ class jenkins {
 
     # get key
     exec { 'install_jenkins_key':
-        command => '/usr/bin/curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null',
+        command => '/usr/bin/sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key',
     }
 
-        # source file
-    file { '/etc/apt/sources.list.d/jenkins.list':
-        content => "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/\n",
-        mode    => '0644',
-        owner   => root,
-        group   => root,
-        require => Exec['install_jenkins_key'],
-    } #ordeno la secuencia de pasos en el tiempo mediante el operador "->".
-    # se utiliza para encadenar semanticamente distintas declaraciones
-    # update
+    -> exec {'add-repository-key':
+        command => 'echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null',
+        path => ['/usr/bin/'],
+    }
     -> exec { 'apt-get update':
-        command => '/usr/bin/apt-get update',
+        command => '/usr/bin/apt-get update -y',
     }
 
     #install jenkins
-    $enhancers = [ 'openjdk-17-jre', 'jenkins' ]
+    $enhancers = [ 'fontconfig', 'openjdk-21-jre', 'jenkins' ]
 
     package { $enhancers:
         ensure => 'installed',
